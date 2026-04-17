@@ -1,0 +1,917 @@
+{
+  "meta": {
+    "title": "English Office Mystery",
+    "caseTitle": "The Missing Coffee Beans",
+    "caseTag": "Case 01",
+    "playerName": "Mia",
+    "preGameVocab": [
+      {
+        "term": "hello",
+        "definition": "say it when you meet a person"
+      },
+      {
+        "term": "coffee machine",
+        "definition": "a machine for coffee"
+      },
+      {
+        "term": "drawer",
+        "definition": "a box in a desk"
+      },
+      {
+        "term": "key",
+        "definition": "it opens a lock"
+      },
+      {
+        "term": "folder",
+        "definition": "it holds papers"
+      },
+      {
+        "term": "printer",
+        "definition": "it prints paper"
+      }
+    ]
+  },
+  "speakers": {
+    "mia": {
+      "name": "Mia",
+      "role": "Junior designer",
+      "avatar": "./assets/images/avatars/mia.svg",
+      "naturalVoice": "en-US-AvaMultilingualNeural",
+      "naturalRate": "-8%",
+      "voice": "Microsoft Zira Desktop",
+      "tokenColor": "#ff8f5a"
+    },
+    "alex": {
+      "name": "Alex",
+      "role": "Coworker",
+      "avatar": "./assets/images/avatars/alex.svg",
+      "naturalVoice": "en-US-AndrewMultilingualNeural",
+      "naturalRate": "-8%",
+      "voice": "Microsoft David Desktop",
+      "tokenColor": "#58b0f6"
+    },
+    "tim": {
+      "name": "Tim",
+      "role": "IT helper",
+      "avatar": "./assets/images/avatars/tim.svg",
+      "naturalVoice": "en-US-BrianMultilingualNeural",
+      "naturalRate": "-8%",
+      "voice": "Microsoft David Desktop",
+      "tokenColor": "#6eca8f"
+    },
+    "nora": {
+      "name": "Nora",
+      "role": "Receptionist",
+      "avatar": "./assets/images/avatars/nora.svg",
+      "naturalVoice": "en-US-EmmaMultilingualNeural",
+      "naturalRate": "-8%",
+      "voice": "Microsoft Zira Desktop",
+      "tokenColor": "#a987ff"
+    },
+    "narrator": {
+      "name": "Narrator",
+      "role": "Office guide",
+      "avatar": "./assets/images/avatars/manager.svg",
+      "naturalVoice": "en-US-JennyNeural",
+      "naturalRate": "-12%",
+      "voice": "Microsoft Zira Desktop",
+      "tokenColor": "#f7c561"
+    }
+  },
+  "introLines": [
+    {
+      "id": "case_intro_1",
+      "speaker": "narrator",
+      "text": "Case one. Find the coffee beans."
+    },
+    {
+      "id": "case_intro_2",
+      "speaker": "mia",
+      "text": "I want coffee. I need the coffee machine."
+    }
+  ],
+  "steps": [
+    {
+      "id": "startCoffee",
+      "title": "Find the machine",
+      "instruction": "I want coffee. Go to the coffee machine.",
+      "targetIds": ["coffeeMachine"],
+      "vocabulary": [
+        {
+          "term": "coffee machine",
+          "definition": "a machine that makes coffee"
+        },
+        {
+          "term": "kitchen",
+          "definition": "a room for food and drinks"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_start_1",
+          "speaker": "narrator",
+          "text": "Look right."
+        },
+        {
+          "id": "hint_start_2",
+          "speaker": "narrator",
+          "text": "The coffee machine is in the kitchen."
+        }
+      ]
+    },
+    {
+      "id": "checkDrawer",
+      "title": "Check the drawer",
+      "instruction": "No beans. Check the drawer.",
+      "targetIds": ["supplyDrawer"],
+      "vocabulary": [
+        {
+          "term": "beans",
+          "definition": "small brown pieces used for coffee"
+        },
+        {
+          "term": "drawer",
+          "definition": "a box in a desk or cabinet"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_drawer_1",
+          "speaker": "narrator",
+          "text": "The drawer is by the counter."
+        },
+        {
+          "id": "hint_drawer_2",
+          "speaker": "narrator",
+          "text": "Find the grey drawer in the kitchen."
+        }
+      ]
+    },
+    {
+      "id": "talkAlex",
+      "title": "Ask Alex",
+      "instruction": "The drawer is locked. Talk to Alex.",
+      "targetIds": ["alex"],
+      "vocabulary": [
+        {
+          "term": "locked",
+          "definition": "closed with a key"
+        },
+        {
+          "term": "key",
+          "definition": "a small metal tool that opens a lock"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_alex_1",
+          "speaker": "narrator",
+          "text": "Alex is in the office."
+        },
+        {
+          "id": "hint_alex_2",
+          "speaker": "narrator",
+          "text": "Look near the orange desk."
+        }
+      ]
+    },
+    {
+      "id": "talkTim",
+      "title": "Ask Tim",
+      "instruction": "Alex says Tim had the key. Talk to Tim.",
+      "targetIds": ["tim"],
+      "vocabulary": [
+        {
+          "term": "used",
+          "definition": "did something with it before"
+        },
+        {
+          "term": "printer",
+          "definition": "a machine that prints paper"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_tim_1",
+          "speaker": "narrator",
+          "text": "Tim is by the printer."
+        },
+        {
+          "id": "hint_tim_2",
+          "speaker": "narrator",
+          "text": "Go right in the office."
+        }
+      ]
+    },
+    {
+      "id": "findBlueFolder",
+      "title": "Find the folder",
+      "instruction": "Tim says the key is by the blue folder. Find the folder.",
+      "targetIds": ["blueFolder"],
+      "vocabulary": [
+        {
+          "term": "folder",
+          "definition": "a flat cover for papers"
+        },
+        {
+          "term": "manager's area",
+          "definition": "the manager's part of the office"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_folder_1",
+          "speaker": "narrator",
+          "text": "The blue folder is at the bottom right."
+        },
+        {
+          "id": "hint_folder_2",
+          "speaker": "narrator",
+          "text": "Look on the big desk."
+        }
+      ]
+    },
+    {
+      "id": "openDrawer",
+      "title": "Open the drawer",
+      "instruction": "You have the key. Open the drawer.",
+      "targetIds": ["supplyDrawer"],
+      "vocabulary": [
+        {
+          "term": "open",
+          "definition": "not closed now"
+        },
+        {
+          "term": "supply",
+          "definition": "things that you need for work"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_open_1",
+          "speaker": "narrator",
+          "text": "Take the key back."
+        },
+        {
+          "id": "hint_open_2",
+          "speaker": "narrator",
+          "text": "The drawer is by the counter."
+        }
+      ]
+    },
+    {
+      "id": "makeCoffee",
+      "title": "Use the beans",
+      "instruction": "Take the beans to the coffee machine.",
+      "targetIds": ["coffeeMachine"],
+      "vocabulary": [
+        {
+          "term": "put in",
+          "definition": "place something inside"
+        },
+        {
+          "term": "at last",
+          "definition": "finally"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_finish_1",
+          "speaker": "narrator",
+          "text": "Go back to the coffee machine."
+        },
+        {
+          "id": "hint_finish_2",
+          "speaker": "narrator",
+          "text": "The coffee machine is in the kitchen."
+        }
+      ]
+    }
+  ],
+  "world": {
+    "width": 1500,
+    "height": 960,
+    "zones": [
+      {
+        "id": "meeting",
+        "label": "Meeting Zone",
+        "x": 120,
+        "y": 80,
+        "width": 540,
+        "height": 220,
+        "color": "#dff3ea"
+      },
+      {
+        "id": "reception",
+        "label": "Reception",
+        "x": 80,
+        "y": 310,
+        "width": 270,
+        "height": 240,
+        "color": "#fce9d5"
+      },
+      {
+        "id": "openOffice",
+        "label": "Open Office",
+        "x": 360,
+        "y": 320,
+        "width": 520,
+        "height": 360,
+        "color": "#f4efe6"
+      },
+      {
+        "id": "kitchen",
+        "label": "Kitchen",
+        "x": 950,
+        "y": 80,
+        "width": 370,
+        "height": 260,
+        "color": "#fff1cf"
+      },
+      {
+        "id": "manager",
+        "label": "Manager Area",
+        "x": 950,
+        "y": 410,
+        "width": 370,
+        "height": 250,
+        "color": "#e7ecff"
+      }
+    ],
+    "decor": [
+      {
+        "id": "receptionDesk",
+        "asset": "reception-desk",
+        "x": 210,
+        "y": 395,
+        "scale": 1.1,
+        "collider": {
+          "width": 220,
+          "height": 88
+        }
+      },
+      {
+        "id": "alexDesk",
+        "asset": "desk",
+        "x": 470,
+        "y": 455,
+        "scale": 1.03,
+        "collider": {
+          "width": 160,
+          "height": 92
+        }
+      },
+      {
+        "id": "timDesk",
+        "asset": "desk",
+        "x": 690,
+        "y": 470,
+        "scale": 1.03,
+        "collider": {
+          "width": 160,
+          "height": 92
+        }
+      },
+      {
+        "id": "meetingTableDecor",
+        "asset": "meeting-table",
+        "x": 385,
+        "y": 180,
+        "scale": 1.12,
+        "collider": {
+          "width": 250,
+          "height": 108
+        }
+      },
+      {
+        "id": "managerDesk",
+        "asset": "desk",
+        "x": 1125,
+        "y": 555,
+        "scale": 1.16,
+        "collider": {
+          "width": 186,
+          "height": 100
+        }
+      },
+      {
+        "id": "counter",
+        "asset": "counter",
+        "x": 1110,
+        "y": 168,
+        "scale": 1.15,
+        "collider": {
+          "width": 210,
+          "height": 92
+        }
+      },
+      {
+        "id": "kitchenCabinet",
+        "asset": "cabinet",
+        "x": 1252,
+        "y": 286,
+        "scale": 1.04,
+        "collider": {
+          "width": 110,
+          "height": 78
+        }
+      },
+      {
+        "id": "whiteboard",
+        "asset": "whiteboard",
+        "x": 425,
+        "y": 88,
+        "scale": 1
+      },
+      {
+        "id": "plantA",
+        "asset": "plant",
+        "x": 122,
+        "y": 118,
+        "scale": 0.95,
+        "collider": {
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "id": "plantB",
+        "asset": "plant",
+        "x": 850,
+        "y": 725,
+        "scale": 0.95,
+        "collider": {
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "id": "plantC",
+        "asset": "plant",
+        "x": 1310,
+        "y": 205,
+        "scale": 0.95,
+        "collider": {
+          "width": 64,
+          "height": 64
+        }
+      },
+      {
+        "id": "meetingPoster",
+        "asset": "meeting-office",
+        "x": 275,
+        "y": 92,
+        "scale": 4
+      },
+      {
+        "id": "womanPoster",
+        "asset": "woman-office",
+        "x": 1115,
+        "y": 445,
+        "scale": 5
+      }
+    ]
+  },
+  "interactives": [
+    {
+      "id": "coffeeMachine",
+      "label": "Coffee machine",
+      "kind": "object",
+      "asset": "coffee-machine",
+      "x": 1235,
+      "y": 160,
+      "scale": 1,
+      "radius": 84,
+      "responses": {
+        "startCoffee": {
+          "lines": [
+            {
+              "id": "coffee_empty_1",
+              "speaker": "mia",
+              "text": "No coffee. No beans."
+            },
+            {
+              "id": "coffee_empty_2",
+              "speaker": "narrator",
+              "text": "Check the drawer."
+            }
+          ],
+          "effects": {
+            "step": "checkDrawer",
+            "notes": [
+              "The machine is empty.",
+              "Find the beans."
+            ]
+          }
+        },
+        "makeCoffee": {
+          "lines": [
+            {
+              "id": "coffee_finish_1",
+              "speaker": "mia",
+              "text": "The beans are in."
+            },
+            {
+              "id": "coffee_finish_2",
+              "speaker": "narrator",
+              "text": "The coffee is ready. Good job."
+            },
+            {
+              "id": "coffee_finish_3",
+              "speaker": "narrator",
+              "text": "You learned drawer, key, folder, printer, and beans."
+            }
+          ],
+          "effects": {
+            "completeCase": true,
+            "notes": [
+              "Coffee is ready.",
+              "You solved the case."
+            ]
+          }
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "coffee_default_1",
+              "speaker": "narrator",
+              "text": "The coffee machine is quiet."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "supplyDrawer",
+      "label": "Supply drawer",
+      "kind": "object",
+      "asset": "drawer",
+      "x": 1075,
+      "y": 286,
+      "scale": 1,
+      "radius": 82,
+      "responses": {
+        "checkDrawer": {
+          "lines": [
+            {
+              "id": "drawer_locked_1",
+              "speaker": "mia",
+              "text": "The supply drawer is locked."
+            },
+            {
+              "id": "drawer_locked_2",
+              "speaker": "mia",
+              "text": "I need a key."
+            }
+          ],
+          "effects": {
+            "step": "talkAlex",
+            "notes": [
+              "The drawer is locked.",
+              "Ask about the key."
+            ]
+          }
+        },
+        "openDrawer": {
+          "lines": [
+            {
+              "id": "drawer_open_1",
+              "speaker": "mia",
+              "text": "The drawer is open now."
+            },
+            {
+              "id": "drawer_open_2",
+              "speaker": "mia",
+              "text": "Here are the coffee beans."
+            },
+            {
+              "id": "drawer_open_3",
+              "speaker": "narrator",
+              "text": "Take the beans to the coffee machine."
+            }
+          ],
+          "effects": {
+            "step": "makeCoffee",
+            "addInventory": ["beans"],
+            "notes": [
+              "You found the beans.",
+              "Go back to the machine."
+            ]
+          }
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "drawer_default_1",
+              "speaker": "narrator",
+              "text": "A grey drawer next to the counter."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "alex",
+      "label": "Alex",
+      "kind": "npc",
+      "speakerId": "alex",
+      "x": 470,
+      "y": 360,
+      "radius": 82,
+      "responses": {
+        "talkAlex": {
+          "lines": [
+            {
+              "id": "alex_clue_1",
+              "speaker": "alex",
+              "text": "Hello, Mia. I do not have the key."
+            },
+            {
+              "id": "alex_clue_2",
+              "speaker": "alex",
+              "text": "Tim had it this morning."
+            },
+            {
+              "id": "alex_clue_3",
+              "speaker": "alex",
+              "text": "He is by the printer."
+            }
+          ],
+          "effects": {
+            "step": "talkTim",
+            "notes": [
+              "Alex does not have the key.",
+              "Tim had the key."
+            ]
+          }
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "alex_default_1",
+              "speaker": "alex",
+              "text": "Hello, Mia."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "tim",
+      "label": "Tim",
+      "kind": "npc",
+      "speakerId": "tim",
+      "x": 835,
+      "y": 384,
+      "radius": 84,
+      "responses": {
+        "talkTim": {
+          "lines": [
+            {
+              "id": "tim_clue_1",
+              "speaker": "tim",
+              "text": "Hello. Yes, I used the key."
+            },
+            {
+              "id": "tim_clue_2",
+              "speaker": "tim",
+              "text": "I put it by the blue folder."
+            }
+          ],
+          "effects": {
+            "step": "findBlueFolder",
+            "notes": [
+              "Tim used the key.",
+              "The key is by the blue folder."
+            ]
+          }
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "tim_default_1",
+              "speaker": "tim",
+              "text": "The printer is busy today."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "nora",
+      "label": "Nora",
+      "kind": "npc",
+      "speakerId": "nora",
+      "x": 190,
+      "y": 505,
+      "radius": 82,
+      "responses": {
+        "talkAlex": {
+          "lines": [
+            {
+              "id": "nora_alex_1",
+              "speaker": "nora",
+              "text": "Alex is in the office."
+            }
+          ]
+        },
+        "talkTim": {
+          "lines": [
+            {
+              "id": "nora_tim_1",
+              "speaker": "nora",
+              "text": "Tim is by the printer."
+            }
+          ]
+        },
+        "findBlueFolder": {
+          "lines": [
+            {
+              "id": "nora_folder_1",
+              "speaker": "nora",
+              "text": "The manager area is at the bottom right."
+            }
+          ]
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "nora_default_1",
+              "speaker": "nora",
+              "text": "Hello, Mia."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "meetingTable",
+      "label": "Meeting table",
+      "kind": "object",
+      "asset": "meeting-table",
+      "x": 385,
+      "y": 180,
+      "scale": 1.12,
+      "radius": 112,
+      "responses": {
+        "talkTim": {
+          "lines": [
+            {
+              "id": "meeting_clue_1",
+              "speaker": "narrator",
+              "text": "A note says: blue folder."
+            }
+          ],
+          "effects": {
+            "notes": [
+              "The note says blue folder."
+            ]
+          }
+        },
+        "findBlueFolder": {
+          "lines": [
+            {
+              "id": "meeting_clue_2",
+              "speaker": "narrator",
+              "text": "Only papers and cups."
+            }
+          ]
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "meeting_default_1",
+              "speaker": "narrator",
+              "text": "Only papers and cups."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "blueFolder",
+      "label": "Blue folder",
+      "kind": "object",
+      "asset": "folder",
+      "x": 1095,
+      "y": 528,
+      "scale": 1,
+      "radius": 86,
+      "responses": {
+        "findBlueFolder": {
+          "lines": [
+            {
+              "id": "folder_key_1",
+              "speaker": "mia",
+              "text": "The key is under the folder."
+            },
+            {
+              "id": "folder_key_2",
+              "speaker": "narrator",
+              "text": "You found the key."
+            }
+          ],
+          "effects": {
+            "step": "openDrawer",
+            "addInventory": ["key"],
+            "notes": [
+              "The key was under the folder.",
+              "Go back to the drawer."
+            ]
+          }
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "folder_default_1",
+              "speaker": "narrator",
+              "text": "Blue folder. Meeting notes."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "printer",
+      "label": "Printer",
+      "kind": "object",
+      "asset": "printer",
+      "x": 770,
+      "y": 440,
+      "scale": 1,
+      "radius": 78,
+      "responses": {
+        "talkTim": {
+          "lines": [
+            {
+              "id": "printer_stage_1",
+              "speaker": "narrator",
+              "text": "Tim is here. Talk to him."
+            }
+          ]
+        },
+        "default": {
+          "lines": [
+            {
+              "id": "printer_default_1",
+              "speaker": "narrator",
+              "text": "The printer is warm."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "plantNote",
+      "label": "Plant",
+      "kind": "object",
+      "asset": "plant",
+      "x": 1320,
+      "y": 205,
+      "scale": 0.95,
+      "radius": 70,
+      "responses": {
+        "default": {
+          "lines": [
+            {
+              "id": "plant_default_1",
+              "speaker": "narrator",
+              "text": "This plant is green."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "whiteboardNote",
+      "label": "Whiteboard",
+      "kind": "object",
+      "asset": "whiteboard",
+      "x": 425,
+      "y": 88,
+      "scale": 1,
+      "radius": 76,
+      "responses": {
+        "default": {
+          "lines": [
+            {
+              "id": "whiteboard_default_1",
+              "speaker": "narrator",
+              "text": "The board shows today's plan."
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "inventoryItems": {
+    "key": {
+      "label": "Brass key",
+      "icon": "./assets/images/ui/key.svg"
+    },
+    "beans": {
+      "label": "Coffee beans",
+      "icon": "./assets/images/ui/beans.svg"
+    }
+  }
+}

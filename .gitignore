@@ -1,0 +1,4 @@
+__pycache__/
+assets/downloads/
+assets/audio/dialogue/*.wav
+preview*.png
