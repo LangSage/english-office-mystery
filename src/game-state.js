@@ -16,6 +16,7 @@ export class GameState {
     this.hintsUsed = 0;
     this.latestDialogue = [];
     this.dialogueHistory = [];
+    this.responseTurns = {};
   }
 
   startCase() {
@@ -87,6 +88,16 @@ export class GameState {
     }
   }
 
+  getResponseLines(response, responseKey) {
+    if (Array.isArray(response.variants) && response.variants.length > 0) {
+      const turn = this.responseTurns[responseKey] ?? 0;
+      this.responseTurns[responseKey] = turn + 1;
+      return response.variants[turn % response.variants.length];
+    }
+
+    return response.lines ?? [];
+  }
+
   interact(interactiveId) {
     if (!this.started) {
       const lines = [
@@ -106,6 +117,9 @@ export class GameState {
       return null;
     }
 
+    const responseKey = interactive.responses?.[this.currentStepId]
+      ? `${interactiveId}:${this.currentStepId}`
+      : `${interactiveId}:default`;
     const response =
       interactive.responses?.[this.currentStepId] ??
       interactive.responses?.default;
@@ -115,7 +129,7 @@ export class GameState {
     }
 
     const previousStepId = this.currentStepId;
-    const lines = response.lines ?? [];
+    const lines = this.getResponseLines(response, responseKey);
 
     this.applyEffects(response.effects);
     this.setDialogue(lines);

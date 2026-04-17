@@ -92,8 +92,8 @@ p {
 
 #phaser-root canvas {
   display: block;
-  width: 100%;
-  height: auto;
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .panel-label,
@@ -285,6 +285,12 @@ p {
   font-size: 0.94rem;
 }
 
+.start-vocab-translation {
+  color: rgba(255, 255, 255, 0.96);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
 .overlay-actions {
   flex-wrap: wrap;
 }
@@ -347,6 +353,27 @@ p {
 .dialogue-text {
   min-height: 48px;
   color: var(--ink-soft);
+}
+
+.word-term,
+.word-definition,
+.word-translation {
+  display: block;
+}
+
+.word-term {
+  font-weight: 800;
+}
+
+.word-definition {
+  margin-top: 4px;
+  color: var(--ink-soft);
+}
+
+.word-translation {
+  margin-top: 6px;
+  color: var(--accent-strong);
+  font-weight: 700;
 }
 
 .data-list,

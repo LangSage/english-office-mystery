@@ -75,6 +75,7 @@ export class UIController {
       entry.innerHTML = `
         <span class="start-vocab-term">${item.term}</span>
         <span class="start-vocab-definition">${item.definition}</span>
+        ${item.translation ? `<span class="start-vocab-translation">${item.translation}</span>` : ""}
       `;
       this.elements.startVocabList.appendChild(entry);
     }
@@ -151,7 +152,11 @@ export class UIController {
 
     for (const item of items) {
       const entry = document.createElement("li");
-      entry.textContent = `${item.term}: ${item.definition}`;
+      entry.innerHTML = `
+        <span class="word-term">${item.term}</span>
+        <span class="word-definition">${item.definition}</span>
+        ${item.translation ? `<span class="word-translation">${item.translation}</span>` : ""}
+      `;
       this.elements.vocabularyList.appendChild(entry);
     }
   }

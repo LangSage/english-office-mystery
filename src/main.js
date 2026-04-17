@@ -438,6 +438,8 @@ async function bootstrap() {
       this.promptLabel = label;
 
       this.cameras.main.startFollow(this.player, true, 0.08, 0.08);
+      this.scale.on("resize", this.handleResize, this);
+      this.handleResize(this.scale.gameSize);
 
       this.cursors = this.input.keyboard.createCursorKeys();
       this.keys = this.input.keyboard.addKeys({
@@ -451,6 +453,12 @@ async function bootstrap() {
       });
 
       render();
+    }
+
+    handleResize(gameSize) {
+      const width = gameSize?.width ?? this.scale.width;
+      const height = gameSize?.height ?? this.scale.height;
+      this.cameras.main.setSize(width, height);
     }
 
     resetPlayerPosition() {
@@ -525,8 +533,8 @@ async function bootstrap() {
   new Phaser.Game({
     type: Phaser.AUTO,
     parent: "phaser-root",
-    width: 960,
-    height: 640,
+    width: window.innerWidth,
+    height: window.innerHeight,
     backgroundColor: "#d5d9dd",
     physics: {
       default: "arcade",
@@ -535,7 +543,7 @@ async function bootstrap() {
       }
     },
     scale: {
-      mode: Phaser.Scale.FIT,
+      mode: Phaser.Scale.RESIZE,
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
     scene: [OfficeScene]

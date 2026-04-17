@@ -40,6 +40,9 @@ def collect_lines(story: dict) -> list[dict]:
         for response in interactive.get("responses", {}).values():
             for line in response.get("lines", []):
                 seen[line["id"]] = line
+            for variant in response.get("variants", []):
+                for line in variant:
+                    seen[line["id"]] = line
 
     return list(seen.values())
 

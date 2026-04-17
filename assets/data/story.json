@@ -7,27 +7,33 @@
     "preGameVocab": [
       {
         "term": "hello",
-        "definition": "say it when you meet a person"
+        "definition": "say it when you meet a person",
+        "translation": "привет"
       },
       {
         "term": "coffee machine",
-        "definition": "a machine for coffee"
+        "definition": "a machine for coffee",
+        "translation": "кофемашина"
       },
       {
         "term": "drawer",
-        "definition": "a box in a desk"
+        "definition": "a box in a desk",
+        "translation": "ящик"
       },
       {
         "term": "key",
-        "definition": "it opens a lock"
+        "definition": "it opens a lock",
+        "translation": "ключ"
       },
       {
         "term": "folder",
-        "definition": "it holds papers"
+        "definition": "it holds papers",
+        "translation": "папка"
       },
       {
         "term": "printer",
-        "definition": "it prints paper"
+        "definition": "it prints paper",
+        "translation": "принтер"
       }
     ]
   },
@@ -99,11 +105,13 @@
       "vocabulary": [
         {
           "term": "coffee machine",
-          "definition": "a machine that makes coffee"
+          "definition": "a machine that makes coffee",
+          "translation": "кофемашина"
         },
         {
           "term": "kitchen",
-          "definition": "a room for food and drinks"
+          "definition": "a room for food and drinks",
+          "translation": "кухня"
         }
       ],
       "hints": [
@@ -127,11 +135,13 @@
       "vocabulary": [
         {
           "term": "beans",
-          "definition": "small brown pieces used for coffee"
+          "definition": "small brown pieces used for coffee",
+          "translation": "кофейные зёрна"
         },
         {
           "term": "drawer",
-          "definition": "a box in a desk or cabinet"
+          "definition": "a box in a desk or cabinet",
+          "translation": "ящик"
         }
       ],
       "hints": [
@@ -155,11 +165,13 @@
       "vocabulary": [
         {
           "term": "locked",
-          "definition": "closed with a key"
+          "definition": "closed with a key",
+          "translation": "заперт"
         },
         {
           "term": "key",
-          "definition": "a small metal tool that opens a lock"
+          "definition": "a small metal tool that opens a lock",
+          "translation": "ключ"
         }
       ],
       "hints": [
@@ -183,11 +195,13 @@
       "vocabulary": [
         {
           "term": "used",
-          "definition": "did something with it before"
+          "definition": "did something with it before",
+          "translation": "использовал"
         },
         {
           "term": "printer",
-          "definition": "a machine that prints paper"
+          "definition": "a machine that prints paper",
+          "translation": "принтер"
         }
       ],
       "hints": [
@@ -211,11 +225,13 @@
       "vocabulary": [
         {
           "term": "folder",
-          "definition": "a flat cover for papers"
+          "definition": "a flat cover for papers",
+          "translation": "папка"
         },
         {
           "term": "manager's area",
-          "definition": "the manager's part of the office"
+          "definition": "the manager's part of the office",
+          "translation": "зона менеджера"
         }
       ],
       "hints": [
@@ -239,11 +255,13 @@
       "vocabulary": [
         {
           "term": "open",
-          "definition": "not closed now"
+          "definition": "not closed now",
+          "translation": "открыт"
         },
         {
           "term": "supply",
-          "definition": "things that you need for work"
+          "definition": "things that you need for work",
+          "translation": "запасы"
         }
       ],
       "hints": [
@@ -267,11 +285,13 @@
       "vocabulary": [
         {
           "term": "put in",
-          "definition": "place something inside"
+          "definition": "place something inside",
+          "translation": "положить внутрь"
         },
         {
           "term": "at last",
-          "definition": "finally"
+          "definition": "finally",
+          "translation": "наконец"
         }
       ],
       "hints": [
@@ -635,6 +655,11 @@
               "id": "alex_clue_3",
               "speaker": "alex",
               "text": "He is by the printer."
+            },
+            {
+              "id": "alex_clue_4",
+              "speaker": "alex",
+              "text": "Please ask Tim."
             }
           ],
           "effects": {
@@ -646,12 +671,28 @@
           }
         },
         "default": {
-          "lines": [
-            {
-              "id": "alex_default_1",
-              "speaker": "alex",
-              "text": "Hello, Mia."
-            }
+          "variants": [
+            [
+              {
+                "id": "alex_default_1",
+                "speaker": "alex",
+                "text": "Hello, Mia."
+              }
+            ],
+            [
+              {
+                "id": "alex_default_2",
+                "speaker": "alex",
+                "text": "I am at my desk."
+              }
+            ],
+            [
+              {
+                "id": "alex_default_3",
+                "speaker": "alex",
+                "text": "I am working now."
+              }
+            ]
           ]
         }
       }
@@ -676,6 +717,11 @@
               "id": "tim_clue_2",
               "speaker": "tim",
               "text": "I put it by the blue folder."
+            },
+            {
+              "id": "tim_clue_3",
+              "speaker": "tim",
+              "text": "Look on the big desk."
             }
           ],
           "effects": {
@@ -687,12 +733,28 @@
           }
         },
         "default": {
-          "lines": [
-            {
-              "id": "tim_default_1",
-              "speaker": "tim",
-              "text": "The printer is busy today."
-            }
+          "variants": [
+            [
+              {
+                "id": "tim_default_1",
+                "speaker": "tim",
+                "text": "The printer is busy today."
+              }
+            ],
+            [
+              {
+                "id": "tim_default_2",
+                "speaker": "tim",
+                "text": "I have many papers here."
+              }
+            ],
+            [
+              {
+                "id": "tim_default_3",
+                "speaker": "tim",
+                "text": "I check the printer every morning."
+              }
+            ]
           ]
         }
       }
@@ -707,39 +769,103 @@
       "radius": 82,
       "responses": {
         "talkAlex": {
-          "lines": [
-            {
-              "id": "nora_alex_1",
-              "speaker": "nora",
-              "text": "Alex is in the office."
-            }
+          "variants": [
+            [
+              {
+                "id": "nora_alex_1",
+                "speaker": "nora",
+                "text": "Alex is in the office."
+              }
+            ],
+            [
+              {
+                "id": "nora_alex_2",
+                "speaker": "nora",
+                "text": "Go to the orange desk."
+              }
+            ],
+            [
+              {
+                "id": "nora_alex_3",
+                "speaker": "nora",
+                "text": "He is on the left side."
+              }
+            ]
           ]
         },
         "talkTim": {
-          "lines": [
-            {
-              "id": "nora_tim_1",
-              "speaker": "nora",
-              "text": "Tim is by the printer."
-            }
+          "variants": [
+            [
+              {
+                "id": "nora_tim_1",
+                "speaker": "nora",
+                "text": "Tim is by the printer."
+              }
+            ],
+            [
+              {
+                "id": "nora_tim_2",
+                "speaker": "nora",
+                "text": "Go right in the office."
+              }
+            ],
+            [
+              {
+                "id": "nora_tim_3",
+                "speaker": "nora",
+                "text": "He is near the printer desk."
+              }
+            ]
           ]
         },
         "findBlueFolder": {
-          "lines": [
-            {
-              "id": "nora_folder_1",
-              "speaker": "nora",
-              "text": "The manager area is at the bottom right."
-            }
+          "variants": [
+            [
+              {
+                "id": "nora_folder_1",
+                "speaker": "nora",
+                "text": "The manager area is at the bottom right."
+              }
+            ],
+            [
+              {
+                "id": "nora_folder_2",
+                "speaker": "nora",
+                "text": "Look for the big desk."
+              }
+            ],
+            [
+              {
+                "id": "nora_folder_3",
+                "speaker": "nora",
+                "text": "The blue folder is there."
+              }
+            ]
           ]
         },
         "default": {
-          "lines": [
-            {
-              "id": "nora_default_1",
-              "speaker": "nora",
-              "text": "Hello, Mia."
-            }
+          "variants": [
+            [
+              {
+                "id": "nora_default_1",
+                "speaker": "nora",
+                "text": "Hello, Mia."
+              }
+            ],
+            [
+              {
+                "id": "nora_default_2",
+                "speaker": "nora",
+                "text": "I can help you find people."
+              }
+            ],
+            [
+              {
+                "id": "nora_default_3",
+                "speaker": "nora",
+                "text": "The front desk is calm today."
+              }
+            ]
           ]
         }
       }
