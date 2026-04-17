@@ -193,12 +193,6 @@ function drawWorld(scene, story) {
     background.fillRoundedRect(zone.x, zone.y, zone.width, zone.height, 24);
     background.lineStyle(2, 0xffffff, 0.7);
     background.strokeRoundedRect(zone.x, zone.y, zone.width, zone.height, 24);
-
-    scene.add.text(zone.x + 18, zone.y + 16, zone.label, {
-      fontFamily: "Fraunces",
-      fontSize: "22px",
-      color: "#2f3644"
-    }).setDepth(5);
   }
 
   background.lineStyle(8, 0xffffff, 0.45);
@@ -262,6 +256,19 @@ async function bootstrap() {
     }
   };
 
+  const showCurrentTask = () => {
+    if (!state.started || state.completed) {
+      return;
+    }
+
+    const step = state.getCurrentStep();
+    ui.showMessage({
+      kicker: `Step ${state.getCurrentStepIndex() + 1}`,
+      title: step.title,
+      text: step.instruction
+    });
+  };
+
   const runLines = (lines) => {
     if (!lines || lines.length === 0) {
       return;
@@ -280,6 +287,7 @@ async function bootstrap() {
     }
     render(lines);
     runLines(lines);
+    showCurrentTask();
   };
 
   const resetCase = () => {
@@ -298,6 +306,15 @@ async function bootstrap() {
     const { lines } = state.requestHint();
     render(lines);
     runLines(lines);
+
+    const hintLine = lines?.[lines.length - 1];
+    if (hintLine) {
+      ui.showMessage({
+        kicker: "Hint",
+        title: "Try this",
+        text: hintLine.text
+      });
+    }
   };
 
   const handleInteraction = (interactiveId) => {
@@ -307,11 +324,15 @@ async function bootstrap() {
     }
     render(result.lines);
     runLines(result.lines);
+    if (result.stepChanged && !result.completed) {
+      showCurrentTask();
+    }
   };
 
   ui.bindHandlers({
     onStart: startCase,
     onReset: resetCase,
+    onInfo: showCurrentTask,
     onHint: requestHint,
     onAudioToggle: () => {
       const enabled = audio.toggle();
@@ -373,15 +394,6 @@ async function bootstrap() {
       this.player.setCircle(24);
       this.player.setCollideWorldBounds(true);
       this.player.setDepth(this.player.y);
-
-      this.playerLabel = this.add.text(this.player.x, this.player.y - 44, "Mia", {
-        fontFamily: "Manrope",
-        fontSize: "16px",
-        fontStyle: "700",
-        color: "#1f2431",
-        backgroundColor: "#ffffffcc",
-        padding: { left: 8, right: 8, top: 3, bottom: 3 }
-      }).setOrigin(0.5).setDepth(1200);
 
       this.physics.add.collider(this.player, obstacleGroup);
 
@@ -470,7 +482,6 @@ async function bootstrap() {
 
       this.player.setVelocity(velocityX, velocityY);
       this.player.setDepth(this.player.y);
-      this.playerLabel.setPosition(this.player.x, this.player.y - 44);
 
       for (const interactive of story.interactives) {
         if (interactive._label) {
@@ -482,7 +493,7 @@ async function bootstrap() {
 
       if (nearby) {
         this.prompt.setVisible(true);
-        this.promptLabel.setText(`E - ${nearby.data.label}`);
+        this.promptLabel.setText(nearby.data.label);
         this.promptBackground.width = Math.max(120, this.promptLabel.width + 28);
         this.prompt.setPosition(nearby.object.x, nearby.object.y - 56);
       } else {

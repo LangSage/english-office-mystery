@@ -10,9 +10,12 @@ export class UIController {
       endSummary: document.getElementById("end-summary"),
       starRow: document.getElementById("star-row"),
       startVocabList: document.getElementById("start-vocab-list"),
-      objectiveTitle: document.getElementById("objective-title"),
-      objectiveText: document.getElementById("objective-text"),
-      stepChip: document.getElementById("step-chip"),
+      messagePanel: document.getElementById("message-panel"),
+      messageKicker: document.getElementById("message-kicker"),
+      messageTitle: document.getElementById("message-title"),
+      messageText: document.getElementById("message-text"),
+      messageClose: document.getElementById("message-close"),
+      infoButton: document.getElementById("info-button"),
       speakerAvatar: document.getElementById("speaker-avatar"),
       speakerName: document.getElementById("speaker-name"),
       speakerRole: document.getElementById("speaker-role"),
@@ -39,10 +42,12 @@ export class UIController {
     this.elements.startButton.addEventListener("click", handlers.onStart);
     this.elements.resetButton.addEventListener("click", handlers.onReset);
     this.elements.playAgainButton.addEventListener("click", handlers.onStart);
+    this.elements.infoButton.addEventListener("click", handlers.onInfo);
     this.elements.hintButton.addEventListener("click", handlers.onHint);
     this.elements.audioButton.addEventListener("click", handlers.onAudioToggle);
     this.elements.replayButton.addEventListener("click", handlers.onReplay);
     this.elements.drawerClose.addEventListener("click", () => this.closeDrawer());
+    this.elements.messageClose.addEventListener("click", () => this.hideMessage());
 
     for (const button of this.drawerButtons) {
       button.addEventListener("click", () => {
@@ -52,6 +57,7 @@ export class UIController {
 
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
+        this.hideMessage();
         this.closeDrawer();
       }
     });
@@ -62,10 +68,6 @@ export class UIController {
   }
 
   renderStartVocabulary() {
-    if (!this.elements.startVocabList) {
-      return;
-    }
-
     this.elements.startVocabList.innerHTML = "";
 
     for (const item of this.getStartVocabulary()) {
@@ -92,17 +94,32 @@ export class UIController {
     this.elements.dialogueText.textContent = line.text;
   }
 
+  showMessage({ kicker = "Task", title = "", text = "" }) {
+    this.closeDrawer();
+    this.elements.messageKicker.textContent = kicker;
+    this.elements.messageTitle.textContent = title;
+    this.elements.messageText.textContent = text;
+    this.elements.messagePanel.classList.remove("message-card-hidden");
+    this.updateCanvasState();
+  }
+
+  hideMessage() {
+    this.elements.messagePanel.classList.add("message-card-hidden");
+    this.updateCanvasState();
+  }
+
   renderAudioState(enabled) {
-    this.elements.audioButton.textContent = enabled ? "Audio On" : "Audio Off";
+    this.elements.audioButton.innerHTML = enabled
+      ? '<span aria-hidden="true">&#128266;</span><span class="sr-only">Audio on</span>'
+      : '<span aria-hidden="true">&#128263;</span><span class="sr-only">Audio off</span>';
+    this.elements.audioButton.setAttribute("aria-label", enabled ? "Audio on" : "Audio off");
+    this.elements.audioButton.setAttribute("title", enabled ? "Audio on" : "Audio off");
   }
 
   render(state) {
     this.renderStartVocabulary();
 
     if (!state.started) {
-      this.elements.objectiveTitle.textContent = "Read 6 words first";
-      this.elements.objectiveText.textContent = "Read the words on the start card. Then press Start Game.";
-      this.elements.stepChip.textContent = "Step 0";
       this.renderVocabularyList(this.getStartVocabulary());
       this.renderInventory(state);
       this.renderList(this.elements.notesList, [
@@ -114,10 +131,6 @@ export class UIController {
     }
 
     const step = state.getCurrentStep();
-    this.elements.objectiveTitle.textContent = step.title;
-    this.elements.objectiveText.textContent = step.instruction;
-    this.elements.stepChip.textContent = `Step ${state.getCurrentStepIndex() + 1}`;
-
     this.renderVocabularyList(step.vocabulary);
     this.renderInventory(state);
     this.renderList(
@@ -203,6 +216,7 @@ export class UIController {
   }
 
   openDrawer(panelId) {
+    this.hideMessage();
     this.activeDrawerId = panelId;
     this.elements.drawerSheet.classList.remove("drawer-sheet-hidden");
 
@@ -217,6 +231,8 @@ export class UIController {
         this.elements.drawerTitle.textContent = button.dataset.drawerTitle ?? "Panel";
       }
     }
+
+    this.updateCanvasState();
   }
 
   closeDrawer() {
@@ -230,6 +246,8 @@ export class UIController {
     for (const button of this.drawerButtons) {
       button.classList.remove("is-active");
     }
+
+    this.updateCanvasState();
   }
 
   hideStart() {
@@ -238,12 +256,15 @@ export class UIController {
   }
 
   showStart() {
+    this.hideMessage();
     this.closeDrawer();
     this.elements.startScreen.classList.remove("overlay-card-hidden");
     this.updateCanvasState();
   }
 
   showEnd(state) {
+    this.hideMessage();
+    this.closeDrawer();
     this.elements.endScreen.classList.remove("overlay-card-hidden");
     this.updateCanvasState();
     this.elements.endTitle.textContent = "The coffee is ready.";
@@ -254,7 +275,7 @@ export class UIController {
     for (let index = 0; index < 3; index += 1) {
       const star = document.createElement("span");
       star.className = "star";
-      star.textContent = index < state.getStars() ? "★" : "☆";
+      star.textContent = index < state.getStars() ? "\u2605" : "\u2606";
       this.elements.starRow.appendChild(star);
     }
   }
@@ -265,9 +286,11 @@ export class UIController {
   }
 
   updateCanvasState() {
-    const blocked =
+    const uiOpen =
       !this.elements.startScreen.classList.contains("overlay-card-hidden") ||
-      !this.elements.endScreen.classList.contains("overlay-card-hidden");
-    this.elements.canvasShell.classList.toggle("is-blocked", blocked);
+      !this.elements.endScreen.classList.contains("overlay-card-hidden") ||
+      !this.elements.messagePanel.classList.contains("message-card-hidden") ||
+      !this.elements.drawerSheet.classList.contains("drawer-sheet-hidden");
+    this.elements.canvasShell.classList.toggle("is-ui-open", uiOpen);
   }
 }

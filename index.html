@@ -12,42 +12,61 @@
 </head>
 <body>
   <div class="page-shell">
-    <header class="hero">
-      <div class="hero-copy">
-        <p class="eyebrow">Phone-First English Game</p>
-        <h1>English Office Mystery</h1>
-        <p class="hero-text">
-          Move in the office, listen to easy English, and solve one small problem step by step.
-        </p>
-      </div>
-      <div class="hero-card">
-        <p class="case-tag">Case 01</p>
-        <h2>The Missing Coffee Beans</h2>
-        <p>Mia wants coffee. Something is wrong. Walk, listen, and find the answer.</p>
-        <ul class="hero-list">
-          <li>Move with arrow keys or <code>WASD</code></li>
-          <li>Press <code>E</code> or <code>Space</code> to interact</li>
-          <li>Press <code>H</code> for a hint</li>
-        </ul>
-      </div>
-    </header>
-
     <main class="game-shell">
       <section class="playfield-card">
-        <div class="playfield-topbar">
-          <div>
-            <p class="panel-label">Case Board</p>
-            <h2>The Missing Coffee Beans</h2>
-          </div>
-          <div class="chip-row">
-            <span class="chip chip-soft">Phone first</span>
-            <span class="chip chip-soft">Easy English</span>
-            <span class="chip chip-soft">Teacher ready</span>
-          </div>
-        </div>
-
         <div class="canvas-shell">
           <div id="phaser-root" aria-label="Game world"></div>
+
+          <div class="hud-rail hud-rail-left" aria-label="Game controls">
+            <button id="info-button" class="hud-button" aria-label="Show task" title="Show task">
+              <span aria-hidden="true">&#9432;</span>
+              <span class="sr-only">Show task</span>
+            </button>
+            <button id="hint-button" class="hud-button" aria-label="Show hint" title="Show hint">
+              <span aria-hidden="true">&#128161;</span>
+              <span class="sr-only">Show hint</span>
+            </button>
+            <button id="audio-button" class="hud-button" aria-label="Audio on" title="Audio on">
+              <span aria-hidden="true">&#128266;</span>
+              <span class="sr-only">Audio on</span>
+            </button>
+            <button id="replay-button" class="hud-button" aria-label="Replay line" title="Replay line">
+              <span aria-hidden="true">&#8635;</span>
+              <span class="sr-only">Replay line</span>
+            </button>
+          </div>
+
+          <div class="hud-rail hud-rail-right" aria-label="Open panels">
+            <button class="hud-button" data-drawer-button="dialogue" data-drawer-title="Talk" aria-label="Talk" title="Talk">
+              <span aria-hidden="true">&#128172;</span>
+              <span class="sr-only">Talk</span>
+            </button>
+            <button class="hud-button" data-drawer-button="words" data-drawer-title="Words" aria-label="Words" title="Words">
+              <span aria-hidden="true">&#128214;</span>
+              <span class="sr-only">Words</span>
+            </button>
+            <button class="hud-button" data-drawer-button="inventory" data-drawer-title="Bag" aria-label="Bag" title="Bag">
+              <span aria-hidden="true">&#128273;</span>
+              <span class="sr-only">Bag</span>
+            </button>
+            <button class="hud-button" data-drawer-button="notes" data-drawer-title="Notes" aria-label="Notes" title="Notes">
+              <span aria-hidden="true">&#128221;</span>
+              <span class="sr-only">Notes</span>
+            </button>
+            <button class="hud-button" data-drawer-button="progress" data-drawer-title="Steps" aria-label="Steps" title="Steps">
+              <span aria-hidden="true">&#127919;</span>
+              <span class="sr-only">Steps</span>
+            </button>
+          </div>
+
+          <section id="message-panel" class="message-card message-card-hidden" aria-live="polite">
+            <div class="message-head">
+              <p id="message-kicker" class="panel-label">Task</p>
+              <button id="message-close" class="button button-primary button-small">Got it</button>
+            </div>
+            <h2 id="message-title">Find the machine</h2>
+            <p id="message-text">Go to the coffee machine.</p>
+          </section>
 
           <div id="start-screen" class="overlay-card">
             <p class="overlay-kicker">6 Words First</p>
@@ -89,57 +108,11 @@
               <button class="touch-button touch-button-large" data-touch-action="hint">Hint</button>
             </div>
           </div>
-        </div>
-
-        <section class="hud-stack">
-          <section class="objective-panel">
-            <div class="panel-head">
-              <div>
-                <p class="panel-label">Now</p>
-                <h3 id="objective-title">Read 6 words first</h3>
-              </div>
-              <span id="step-chip" class="chip chip-strong">Step 0</span>
-            </div>
-            <p id="objective-text" class="objective-text">
-              Read the words on the start card. Then press Start Game.
-            </p>
-            <div class="button-row">
-              <button id="hint-button" class="button button-primary">Hint</button>
-              <button id="audio-button" class="button button-secondary">Audio On</button>
-              <button id="replay-button" class="button button-secondary">Replay Line</button>
-            </div>
-          </section>
-
-          <section class="dock-panel">
-            <p class="panel-label">Open Panels</p>
-            <div class="dock-row">
-              <button class="dock-button" data-drawer-button="dialogue" data-drawer-title="Talk">
-                <span class="dock-icon" aria-hidden="true">&#128172;</span>
-                <span class="dock-text">Talk</span>
-              </button>
-              <button class="dock-button" data-drawer-button="words" data-drawer-title="Words">
-                <span class="dock-icon" aria-hidden="true">&#128214;</span>
-                <span class="dock-text">Words</span>
-              </button>
-              <button class="dock-button" data-drawer-button="inventory" data-drawer-title="Bag">
-                <span class="dock-icon" aria-hidden="true">&#128273;</span>
-                <span class="dock-text">Bag</span>
-              </button>
-              <button class="dock-button" data-drawer-button="notes" data-drawer-title="Notes">
-                <span class="dock-icon" aria-hidden="true">&#128221;</span>
-                <span class="dock-text">Notes</span>
-              </button>
-              <button class="dock-button" data-drawer-button="progress" data-drawer-title="Steps">
-                <span class="dock-icon" aria-hidden="true">&#127919;</span>
-                <span class="dock-text">Steps</span>
-              </button>
-            </div>
-          </section>
 
           <section id="drawer-sheet" class="drawer-sheet drawer-sheet-hidden">
             <div class="drawer-head">
               <div>
-                <p class="panel-label">Open Panel</p>
+                <p class="panel-label">Panel</p>
                 <h3 id="drawer-title">Talk</h3>
               </div>
               <button id="drawer-close" class="button button-secondary button-small">Close</button>
@@ -174,7 +147,7 @@
               <ol id="progress-list" class="progress-list"></ol>
             </section>
           </section>
-        </section>
+        </div>
       </section>
     </main>
   </div>
