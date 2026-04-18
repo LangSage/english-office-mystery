@@ -23,11 +23,11 @@ STORY_PATH = ROOT / "assets" / "data" / "story.json"
 AUDIO_DIR = ROOT / "assets" / "audio" / "dialogue"
 FFMPEG_PATH = shutil.which("ffmpeg")
 DEFAULT_EDGE_VOICE = "en-US-EmmaMultilingualNeural"
-DEFAULT_EDGE_RATE = "-18%"
+DEFAULT_EDGE_RATE = "-24%"
 DEFAULT_EDGE_VOLUME = "+0%"
 DEFAULT_EDGE_PITCH = "+0Hz"
-DEFAULT_SYSTEM_RATE = -2
-LEADING_SILENCE_MS = 140
+DEFAULT_SYSTEM_RATE = -3
+LEADING_SILENCE_MS = 220
 
 
 def collect_lines(story: dict) -> list[dict]:
@@ -108,7 +108,7 @@ def get_speaker_config(line: dict, speakers: dict) -> dict:
 
 def pad_leading_silence(output_path: Path) -> None:
     if FFMPEG_PATH is None or not output_path.exists():
-      return
+        return
 
     padded_path = output_path.with_name(f"{output_path.stem}-padded{output_path.suffix}")
     codec_args = ["-c:a", "pcm_s16le"] if output_path.suffix == ".wav" else ["-codec:a", "libmp3lame", "-q:a", "2"]
@@ -119,7 +119,7 @@ def pad_leading_silence(output_path: Path) -> None:
             "-i",
             str(output_path),
             "-af",
-            f"adelay={LEADING_SILENCE_MS}:all=true",
+            f"adelay={LEADING_SILENCE_MS}:all=true,loudnorm=I=-16:TP=-1.5:LRA=11",
             *codec_args,
             str(padded_path),
         ],

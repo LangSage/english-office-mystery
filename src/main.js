@@ -22,6 +22,7 @@ class AudioController {
     this.enabled = true;
     this.queueId = 0;
     this.lastLines = [];
+    this.lastLineCallback = null;
     this.currentAudio = null;
   }
 
@@ -44,27 +45,29 @@ class AudioController {
 
   replay() {
     if (this.lastLines.length > 0) {
-      this.playLines(this.lastLines);
+      this.playLines(this.lastLines, this.lastLineCallback);
     }
   }
 
-  playLines(lines) {
+  playLines(lines, onLineStart = null) {
     this.lastLines = lines.map((line) => ({ ...line }));
+    this.lastLineCallback = onLineStart;
     if (!this.enabled || lines.length === 0) {
       return;
     }
 
     this.stop();
     const queueId = this.queueId;
-    this.runQueue(queueId, this.lastLines);
+    this.runQueue(queueId, this.lastLines, onLineStart);
   }
 
-  async runQueue(queueId, lines) {
+  async runQueue(queueId, lines, onLineStart) {
     for (const line of lines) {
       if (!this.enabled || queueId !== this.queueId) {
         return;
       }
 
+      onLineStart?.(line);
       await this.playSingle(line.id);
     }
   }
@@ -84,6 +87,7 @@ class AudioController {
         }
 
         const audio = new Audio(candidates[index]);
+        audio.preload = "auto";
         this.currentAudio = audio;
 
         const cleanup = () => {
@@ -251,11 +255,8 @@ async function bootstrap() {
 
   let sceneRef = null;
 
-  const render = (lines = state.latestDialogue) => {
+  const render = () => {
     ui.render(state);
-    if (lines?.length) {
-      ui.setDialogue(lines, story.speakers);
-    }
     ui.renderAudioState(audio.enabled);
     if (sceneRef) {
       syncTargetMarkers(state, sceneRef.targetMarkers);
@@ -279,8 +280,15 @@ async function bootstrap() {
     if (!lines || lines.length === 0) {
       return;
     }
+
+    if (audio.enabled) {
+      audio.playLines(lines, (line) => {
+        ui.setDialogueLine(line, story.speakers);
+      });
+      return;
+    }
+
     ui.setDialogue(lines, story.speakers);
-    audio.playLines(lines);
   };
 
   const startCase = () => {
@@ -291,7 +299,7 @@ async function bootstrap() {
       sceneRef.resetPlayerPosition();
       syncTargetMarkers(state, sceneRef.targetMarkers);
     }
-    render(lines);
+    render();
     runLines(lines);
     showCurrentTask();
   };
@@ -305,12 +313,12 @@ async function bootstrap() {
       sceneRef.resetPlayerPosition();
       syncTargetMarkers(state, sceneRef.targetMarkers);
     }
-    render([]);
+    render();
   };
 
   const requestHint = () => {
     const { lines } = state.requestHint();
-    render(lines);
+    render();
     runLines(lines);
 
     const hintLine = lines?.[lines.length - 1];
@@ -328,7 +336,7 @@ async function bootstrap() {
     if (!result) {
       return;
     }
-    render(result.lines);
+    render();
     runLines(result.lines);
     if (result.stepChanged && !result.completed) {
       showCurrentTask();
@@ -344,7 +352,11 @@ async function bootstrap() {
       const enabled = audio.toggle();
       ui.renderAudioState(enabled);
     },
-    onReplay: () => audio.replay()
+    onReplay: () => audio.replay(),
+    onWordsViewed: () => {
+      state.markCurrentVocabularySeen();
+      render();
+    }
   });
 
   const resetJoystick = () => {
@@ -604,7 +616,7 @@ async function bootstrap() {
     scene: [OfficeScene]
   });
 
-  render([]);
+  render();
 
   if (query.get("mute") === "1") {
     audio.enabled = false;

@@ -150,6 +150,28 @@ p {
   background: rgba(255, 143, 90, 0.88);
 }
 
+.hud-button.has-fresh-words {
+  position: relative;
+  animation: wordsGlow 1.35s ease-in-out infinite alternate;
+  background: rgba(255, 143, 90, 0.92);
+  box-shadow:
+    0 0 0 1px rgba(255, 214, 153, 0.18),
+    0 0 20px rgba(255, 180, 96, 0.46),
+    0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
+.hud-button.has-fresh-words::after {
+  content: "";
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff7d3;
+  box-shadow: 0 0 10px rgba(255, 247, 211, 0.92);
+}
+
 .button {
   appearance: none;
   border: 0;
@@ -182,6 +204,7 @@ p {
   padding: 0 14px;
 }
 
+.subtitle-card,
 .message-card,
 .drawer-sheet,
 .overlay-card {
@@ -189,9 +212,45 @@ p {
   box-shadow: var(--shadow);
 }
 
-.message-card {
+.subtitle-card {
   position: absolute;
   top: 12px;
+  left: 64px;
+  right: 64px;
+  z-index: 6;
+  display: grid;
+  gap: 4px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 10px 14px;
+  color: white;
+  background: rgba(8, 19, 31, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(16px);
+  pointer-events: none;
+}
+
+.subtitle-card-hidden {
+  display: none;
+}
+
+.subtitle-speaker {
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.subtitle-text {
+  font-size: 0.97rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.message-card {
+  position: absolute;
+  top: 78px;
   left: 64px;
   right: 64px;
   z-index: 6;
@@ -550,6 +609,18 @@ p {
   display: none;
 }
 
+@keyframes wordsGlow {
+  0% {
+    transform: translateY(0);
+    filter: saturate(0.92);
+  }
+
+  100% {
+    transform: translateY(-1px);
+    filter: saturate(1.12);
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -573,6 +644,12 @@ p {
     padding: 16px 18px;
   }
 
+  .subtitle-card {
+    left: 84px;
+    right: 84px;
+    padding: 12px 16px;
+  }
+
   .overlay-card {
     inset: 18px;
     padding: 28px;
@@ -594,10 +671,14 @@ p {
   }
 
   .message-card {
-    top: 18px;
+    top: 84px;
   }
 
   .hud-rail {
+    top: 18px;
+  }
+
+  .subtitle-card {
     top: 18px;
   }
 

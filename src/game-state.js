@@ -17,6 +17,8 @@ export class GameState {
     this.latestDialogue = [];
     this.dialogueHistory = [];
     this.responseTurns = {};
+    this.knownVocabularyTerms = new Set();
+    this.pendingVocabularyTerms = new Set();
   }
 
   startCase() {
@@ -26,6 +28,7 @@ export class GameState {
       "Mia wants coffee.",
       "Listen to the clues."
     ];
+    this.queueVocabulary(this.getCurrentStep().vocabulary);
     this.setDialogue(this.story.introLines);
     return this.story.introLines;
   }
@@ -66,6 +69,35 @@ export class GameState {
     }
     this.currentStepId = stepId;
     this.hintLevel = 0;
+    this.queueVocabulary(this.getCurrentStep().vocabulary);
+  }
+
+  queueVocabulary(items = []) {
+    this.pendingVocabularyTerms.clear();
+    for (const item of items) {
+      if (!item?.term || this.knownVocabularyTerms.has(item.term)) {
+        continue;
+      }
+      this.pendingVocabularyTerms.add(item.term);
+    }
+  }
+
+  markCurrentVocabularySeen() {
+    if (!this.started) {
+      return;
+    }
+
+    for (const item of this.getCurrentStep().vocabulary ?? []) {
+      if (!item?.term) {
+        continue;
+      }
+      this.knownVocabularyTerms.add(item.term);
+      this.pendingVocabularyTerms.delete(item.term);
+    }
+  }
+
+  hasUnreadVocabulary() {
+    return this.started && this.pendingVocabularyTerms.size > 0;
   }
 
   applyEffects(effects = {}) {

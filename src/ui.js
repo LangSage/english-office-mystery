@@ -2,6 +2,7 @@ export class UIController {
   constructor(story) {
     this.story = story;
     this.activeDrawerId = null;
+    this.handlers = null;
     this.elements = {
       startScreen: document.getElementById("start-screen"),
       endScreen: document.getElementById("end-screen"),
@@ -10,6 +11,9 @@ export class UIController {
       endSummary: document.getElementById("end-summary"),
       starRow: document.getElementById("star-row"),
       startVocabList: document.getElementById("start-vocab-list"),
+      subtitlePanel: document.getElementById("subtitle-panel"),
+      subtitleSpeaker: document.getElementById("subtitle-speaker"),
+      subtitleText: document.getElementById("subtitle-text"),
       messagePanel: document.getElementById("message-panel"),
       messageKicker: document.getElementById("message-kicker"),
       messageTitle: document.getElementById("message-title"),
@@ -39,6 +43,7 @@ export class UIController {
   }
 
   bindHandlers(handlers) {
+    this.handlers = handlers;
     this.elements.startButton.addEventListener("click", handlers.onStart);
     this.elements.resetButton.addEventListener("click", handlers.onReset);
     this.elements.playAgainButton.addEventListener("click", handlers.onStart);
@@ -81,9 +86,7 @@ export class UIController {
     }
   }
 
-  setDialogue(lines, speakers) {
-    const line = lines?.[lines.length - 1];
-
+  setDialogueLine(line, speakers) {
     if (!line) {
       return;
     }
@@ -93,6 +96,18 @@ export class UIController {
     this.elements.speakerName.textContent = speaker.name;
     this.elements.speakerRole.textContent = speaker.role;
     this.elements.dialogueText.textContent = line.text;
+    this.elements.subtitleSpeaker.textContent = speaker.name;
+    this.elements.subtitleText.textContent = line.text;
+    this.elements.subtitlePanel.classList.remove("subtitle-card-hidden");
+  }
+
+  setDialogue(lines, speakers) {
+    const line = lines?.[lines.length - 1];
+    this.setDialogueLine(line, speakers);
+  }
+
+  hideSubtitle() {
+    this.elements.subtitlePanel.classList.add("subtitle-card-hidden");
   }
 
   showMessage({ kicker = "Task", title = "", text = "" }) {
@@ -119,6 +134,7 @@ export class UIController {
 
   render(state) {
     this.renderStartVocabulary();
+    this.renderWordsAttention(state.hasUnreadVocabulary());
 
     if (!state.started) {
       this.renderVocabularyList(this.getStartVocabulary());
@@ -145,6 +161,14 @@ export class UIController {
     } else {
       this.hideEnd();
     }
+  }
+
+  renderWordsAttention(enabled) {
+    const wordsButton = this.drawerButtons.find((button) => button.dataset.drawerButton === "words");
+    if (!wordsButton) {
+      return;
+    }
+    wordsButton.classList.toggle("has-fresh-words", enabled);
   }
 
   renderVocabularyList(items) {
@@ -237,6 +261,10 @@ export class UIController {
       }
     }
 
+    if (panelId === "words" && this.handlers?.onWordsViewed) {
+      this.handlers.onWordsViewed();
+    }
+
     this.updateCanvasState();
   }
 
@@ -262,6 +290,7 @@ export class UIController {
 
   showStart() {
     this.hideMessage();
+    this.hideSubtitle();
     this.closeDrawer();
     this.elements.startScreen.classList.remove("overlay-card-hidden");
     this.updateCanvasState();
@@ -269,6 +298,7 @@ export class UIController {
 
   showEnd(state) {
     this.hideMessage();
+    this.hideSubtitle();
     this.closeDrawer();
     this.elements.endScreen.classList.remove("overlay-card-hidden");
     this.updateCanvasState();

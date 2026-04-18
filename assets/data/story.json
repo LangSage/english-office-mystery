@@ -43,7 +43,7 @@
       "role": "Junior designer",
       "avatar": "./assets/images/avatars/mia.svg",
       "naturalVoice": "en-US-AvaMultilingualNeural",
-      "naturalRate": "-18%",
+      "naturalRate": "-26%",
       "voice": "Microsoft Zira Desktop",
       "tokenColor": "#ff8f5a"
     },
@@ -52,7 +52,7 @@
       "role": "Coworker",
       "avatar": "./assets/images/avatars/alex.svg",
       "naturalVoice": "en-US-AndrewMultilingualNeural",
-      "naturalRate": "-18%",
+      "naturalRate": "-26%",
       "voice": "Microsoft David Desktop",
       "tokenColor": "#58b0f6"
     },
@@ -61,7 +61,7 @@
       "role": "IT helper",
       "avatar": "./assets/images/avatars/tim.svg",
       "naturalVoice": "en-US-BrianMultilingualNeural",
-      "naturalRate": "-18%",
+      "naturalRate": "-26%",
       "voice": "Microsoft David Desktop",
       "tokenColor": "#6eca8f"
     },
@@ -70,7 +70,7 @@
       "role": "Receptionist",
       "avatar": "./assets/images/avatars/nora.svg",
       "naturalVoice": "en-US-EmmaMultilingualNeural",
-      "naturalRate": "-18%",
+      "naturalRate": "-26%",
       "voice": "Microsoft Zira Desktop",
       "tokenColor": "#a987ff"
     },
@@ -79,7 +79,7 @@
       "role": "Office guide",
       "avatar": "./assets/images/avatars/manager.svg",
       "naturalVoice": "en-US-JennyNeural",
-      "naturalRate": "-22%",
+      "naturalRate": "-30%",
       "voice": "Microsoft Zira Desktop",
       "tokenColor": "#f7c561"
     }
@@ -274,6 +274,36 @@
           "id": "hint_open_2",
           "speaker": "narrator",
           "text": "The drawer is by the counter."
+        }
+      ]
+    },
+    {
+      "id": "checkCabinet",
+      "title": "Check the cabinet",
+      "instruction": "You need a cup. Check the kitchen cabinet.",
+      "targetIds": ["cupCabinet"],
+      "vocabulary": [
+        {
+          "term": "cabinet",
+          "definition": "a tall box with shelves",
+          "translation": "шкаф"
+        },
+        {
+          "term": "empty",
+          "definition": "nothing is inside",
+          "translation": "пустой"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_cabinet_1",
+          "speaker": "narrator",
+          "text": "Look in the kitchen."
+        },
+        {
+          "id": "hint_cabinet_2",
+          "speaker": "narrator",
+          "text": "The cabinet is by the counter."
         }
       ]
     },
@@ -706,11 +736,11 @@
             }
           ],
           "effects": {
-            "step": "askNoraCup",
+            "step": "checkCabinet",
             "addInventory": ["beans"],
             "notes": [
               "You found the beans.",
-              "Now find a clean cup."
+              "Now check for a cup."
             ]
           }
         },
@@ -1101,6 +1131,62 @@
               "speaker": "narrator",
               "text": "Blue folder. Meeting notes."
             }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cupCabinet",
+      "label": "Cup cabinet",
+      "kind": "object",
+      "asset": "cabinet",
+      "x": 1252,
+      "y": 286,
+      "scale": 1.04,
+      "radius": 88,
+      "responses": {
+        "checkCabinet": {
+          "lines": [
+            {
+              "id": "cabinet_empty_1",
+              "speaker": "mia",
+              "text": "No clean cup here."
+            },
+            {
+              "id": "cabinet_empty_2",
+              "speaker": "narrator",
+              "text": "The cabinet is empty."
+            },
+            {
+              "id": "cabinet_empty_3",
+              "speaker": "narrator",
+              "text": "Ask Nora at reception."
+            }
+          ],
+          "effects": {
+            "step": "askNoraCup",
+            "notes": [
+              "The cabinet is empty.",
+              "Ask Nora for a cup."
+            ]
+          }
+        },
+        "default": {
+          "variants": [
+            [
+              {
+                "id": "cabinet_default_1",
+                "speaker": "narrator",
+                "text": "This cabinet is closed."
+              }
+            ],
+            [
+              {
+                "id": "cabinet_default_2",
+                "speaker": "narrator",
+                "text": "Cups and bowls can go here."
+              }
+            ]
           ]
         }
       }
