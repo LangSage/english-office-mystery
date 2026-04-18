@@ -6,8 +6,8 @@
     "playerName": "Mia",
     "preGameVocab": [
       {
-        "term": "hello",
-        "definition": "say it when you meet a person",
+        "term": "hey",
+        "definition": "a casual word for hello",
         "translation": "привет"
       },
       {
@@ -769,7 +769,7 @@
             {
               "id": "alex_clue_1",
               "speaker": "alex",
-              "text": "Hello, Mia. I do not have the key."
+              "text": "Hey, what's up, Mia? I do not have the key."
             },
             {
               "id": "alex_clue_2",
@@ -801,7 +801,7 @@
               {
                 "id": "alex_default_1",
                 "speaker": "alex",
-                "text": "Hello, Mia."
+                "text": "Hey, what's up, Mia?"
               }
             ],
             [
@@ -836,7 +836,7 @@
             {
               "id": "tim_clue_1",
               "speaker": "tim",
-              "text": "Hello. Yes, I used the key."
+              "text": "Hey, what's up? Yes, I used the key."
             },
             {
               "id": "tim_clue_2",
@@ -973,7 +973,7 @@
             {
               "id": "nora_cup_1",
               "speaker": "nora",
-              "text": "Hello, Mia. The clean cup is on the meeting table."
+              "text": "Hey, what's up, Mia? The clean cup is on the meeting table."
             },
             {
               "id": "nora_cup_2",
@@ -1000,7 +1000,7 @@
               {
                 "id": "nora_default_1",
                 "speaker": "nora",
-                "text": "Hello, Mia."
+                "text": "Hey, what's up, Mia?"
               }
             ],
             [

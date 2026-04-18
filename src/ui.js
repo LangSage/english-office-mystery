@@ -3,6 +3,7 @@ export class UIController {
     this.story = story;
     this.activeDrawerId = null;
     this.handlers = null;
+    this.subtitleTimeoutId = null;
     this.elements = {
       startScreen: document.getElementById("start-screen"),
       endScreen: document.getElementById("end-screen"),
@@ -91,6 +92,7 @@ export class UIController {
       return;
     }
 
+    this.clearSubtitleTimeout();
     const speaker = speakers[line.speaker] ?? speakers.narrator;
     this.elements.speakerAvatar.src = speaker.avatar;
     this.elements.speakerName.textContent = speaker.name;
@@ -107,7 +109,23 @@ export class UIController {
   }
 
   hideSubtitle() {
+    this.clearSubtitleTimeout();
     this.elements.subtitlePanel.classList.add("subtitle-card-hidden");
+  }
+
+  clearSubtitleTimeout() {
+    if (this.subtitleTimeoutId) {
+      window.clearTimeout(this.subtitleTimeoutId);
+      this.subtitleTimeoutId = null;
+    }
+  }
+
+  scheduleSubtitleHide(delayMs = 3000) {
+    this.clearSubtitleTimeout();
+    this.subtitleTimeoutId = window.setTimeout(() => {
+      this.elements.subtitlePanel.classList.add("subtitle-card-hidden");
+      this.subtitleTimeoutId = null;
+    }, delayMs);
   }
 
   showMessage({ kicker = "Task", title = "", text = "" }) {

@@ -22,7 +22,7 @@ class AudioController {
     this.enabled = true;
     this.queueId = 0;
     this.lastLines = [];
-    this.lastLineCallback = null;
+    this.lastCallbacks = {};
     this.currentAudio = null;
   }
 
@@ -45,30 +45,36 @@ class AudioController {
 
   replay() {
     if (this.lastLines.length > 0) {
-      this.playLines(this.lastLines, this.lastLineCallback);
+      this.playLines(this.lastLines, this.lastCallbacks);
     }
   }
 
-  playLines(lines, onLineStart = null) {
+  playLines(lines, callbacks = {}) {
     this.lastLines = lines.map((line) => ({ ...line }));
-    this.lastLineCallback = onLineStart;
+    this.lastCallbacks = callbacks;
     if (!this.enabled || lines.length === 0) {
       return;
     }
 
     this.stop();
     const queueId = this.queueId;
-    this.runQueue(queueId, this.lastLines, onLineStart);
+    this.runQueue(queueId, this.lastLines, callbacks);
   }
 
-  async runQueue(queueId, lines, onLineStart) {
+  async runQueue(queueId, lines, callbacks) {
     for (const line of lines) {
       if (!this.enabled || queueId !== this.queueId) {
         return;
       }
 
-      onLineStart?.(line);
+      callbacks.onLineStart?.(line);
       await this.playSingle(line.id);
+
+      if (!this.enabled || queueId !== this.queueId) {
+        return;
+      }
+
+      callbacks.onLineEnd?.(line);
     }
   }
 
@@ -282,13 +288,19 @@ async function bootstrap() {
     }
 
     if (audio.enabled) {
-      audio.playLines(lines, (line) => {
-        ui.setDialogueLine(line, story.speakers);
+      audio.playLines(lines, {
+        onLineStart: (line) => {
+          ui.setDialogueLine(line, story.speakers);
+        },
+        onLineEnd: () => {
+          ui.scheduleSubtitleHide(3000);
+        }
       });
       return;
     }
 
     ui.setDialogue(lines, story.speakers);
+    ui.scheduleSubtitleHide(3000);
   };
 
   const startCase = () => {
