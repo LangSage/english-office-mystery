@@ -235,12 +235,18 @@ async function bootstrap() {
   const ui = new UIController(story);
   const audio = new AudioController();
   const touchState = {
-    up: false,
-    down: false,
-    left: false,
-    right: false,
+    moveX: 0,
+    moveY: 0,
     interact: false,
     hint: false
+  };
+  const joystickElements = {
+    base: document.getElementById("joystick-base"),
+    knob: document.getElementById("joystick-knob")
+  };
+  const joystickState = {
+    activePointerId: null,
+    radius: 36
   };
 
   let sceneRef = null;
@@ -341,16 +347,65 @@ async function bootstrap() {
     onReplay: () => audio.replay()
   });
 
-  document.querySelectorAll("[data-touch]").forEach((button) => {
-    const direction = button.getAttribute("data-touch");
-    const activate = (value) => {
-      touchState[direction] = value;
+  const resetJoystick = () => {
+    joystickState.activePointerId = null;
+    touchState.moveX = 0;
+    touchState.moveY = 0;
+    if (joystickElements.knob) {
+      joystickElements.knob.style.transform = "translate(0px, 0px)";
+    }
+  };
+
+  const updateJoystick = (event) => {
+    if (!joystickElements.base || !joystickElements.knob) {
+      return;
+    }
+
+    const rect = joystickElements.base.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const deltaX = event.clientX - centerX;
+    const deltaY = event.clientY - centerY;
+    const distance = Math.hypot(deltaX, deltaY);
+    const clampedDistance = Math.min(distance, joystickState.radius);
+    const angle = Math.atan2(deltaY, deltaX);
+    const knobX = Math.cos(angle) * clampedDistance;
+    const knobY = Math.sin(angle) * clampedDistance;
+
+    touchState.moveX = knobX / joystickState.radius;
+    touchState.moveY = knobY / joystickState.radius;
+    joystickElements.knob.style.transform =
+      `translate(${knobX}px, ${knobY}px)`;
+  };
+
+  if (joystickElements.base) {
+    joystickElements.base.addEventListener("pointerdown", (event) => {
+      joystickState.activePointerId = event.pointerId;
+      joystickElements.base.setPointerCapture(event.pointerId);
+      updateJoystick(event);
+    });
+
+    joystickElements.base.addEventListener("pointermove", (event) => {
+      if (joystickState.activePointerId !== event.pointerId) {
+        return;
+      }
+      updateJoystick(event);
+    });
+
+    const releaseJoystick = (event) => {
+      if (joystickState.activePointerId !== event.pointerId) {
+        return;
+      }
+      if (joystickElements.base.hasPointerCapture(event.pointerId)) {
+        joystickElements.base.releasePointerCapture(event.pointerId);
+      }
+      resetJoystick();
     };
-    button.addEventListener("pointerdown", () => activate(true));
-    button.addEventListener("pointerup", () => activate(false));
-    button.addEventListener("pointerleave", () => activate(false));
-    button.addEventListener("pointercancel", () => activate(false));
-  });
+
+    joystickElements.base.addEventListener("pointerup", releaseJoystick);
+    joystickElements.base.addEventListener("pointercancel", releaseJoystick);
+    joystickElements.base.addEventListener("pointerleave", releaseJoystick);
+  }
 
   document.querySelectorAll("[data-touch-action]").forEach((button) => {
     const action = button.getAttribute("data-touch-action");
@@ -472,19 +527,19 @@ async function bootstrap() {
 
     update() {
       const speed = 180;
-      let velocityX = 0;
-      let velocityY = 0;
+      let velocityX = touchState.moveX * speed;
+      let velocityY = touchState.moveY * speed;
 
-      if (this.cursors.left.isDown || this.keys.left.isDown || touchState.left) {
+      if (this.cursors.left.isDown || this.keys.left.isDown) {
         velocityX -= speed;
       }
-      if (this.cursors.right.isDown || this.keys.right.isDown || touchState.right) {
+      if (this.cursors.right.isDown || this.keys.right.isDown) {
         velocityX += speed;
       }
-      if (this.cursors.up.isDown || this.keys.up.isDown || touchState.up) {
+      if (this.cursors.up.isDown || this.keys.up.isDown) {
         velocityY -= speed;
       }
-      if (this.cursors.down.isDown || this.keys.down.isDown || touchState.down) {
+      if (this.cursors.down.isDown || this.keys.down.isDown) {
         velocityY += speed;
       }
 

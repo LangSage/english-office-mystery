@@ -94,18 +94,21 @@
           </div>
 
           <div class="touch-controls" aria-label="Touch controls">
-            <div class="dpad">
-              <button class="touch-button" data-touch="up" aria-label="Move up">&uarr;</button>
-              <div class="dpad-row">
-                <button class="touch-button" data-touch="left" aria-label="Move left">&larr;</button>
-                <button class="touch-button touch-button-center" aria-hidden="true">&bull;</button>
-                <button class="touch-button" data-touch="right" aria-label="Move right">&rarr;</button>
+            <div class="joystick-shell">
+              <div id="joystick-base" class="joystick-base" aria-label="Move joystick">
+                <div id="joystick-knob" class="joystick-knob"></div>
               </div>
-              <button class="touch-button" data-touch="down" aria-label="Move down">&darr;</button>
+              <p class="touch-label">Move</p>
             </div>
             <div class="action-buttons">
-              <button class="touch-button touch-button-large" data-touch-action="interact">Talk</button>
-              <button class="touch-button touch-button-large" data-touch-action="hint">Hint</button>
+              <button class="touch-button touch-button-action" data-touch-action="interact" aria-label="Talk">
+                <span class="touch-button-symbol" aria-hidden="true">E</span>
+                <span class="touch-button-text">Talk</span>
+              </button>
+              <button class="touch-button touch-button-action" data-touch-action="hint" aria-label="Hint">
+                <span class="touch-button-symbol" aria-hidden="true">H</span>
+                <span class="touch-button-text">Hint</span>
+              </button>
             </div>
           </div>
 

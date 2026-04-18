@@ -43,7 +43,7 @@
       "role": "Junior designer",
       "avatar": "./assets/images/avatars/mia.svg",
       "naturalVoice": "en-US-AvaMultilingualNeural",
-      "naturalRate": "-8%",
+      "naturalRate": "-18%",
       "voice": "Microsoft Zira Desktop",
       "tokenColor": "#ff8f5a"
     },
@@ -52,7 +52,7 @@
       "role": "Coworker",
       "avatar": "./assets/images/avatars/alex.svg",
       "naturalVoice": "en-US-AndrewMultilingualNeural",
-      "naturalRate": "-8%",
+      "naturalRate": "-18%",
       "voice": "Microsoft David Desktop",
       "tokenColor": "#58b0f6"
     },
@@ -61,7 +61,7 @@
       "role": "IT helper",
       "avatar": "./assets/images/avatars/tim.svg",
       "naturalVoice": "en-US-BrianMultilingualNeural",
-      "naturalRate": "-8%",
+      "naturalRate": "-18%",
       "voice": "Microsoft David Desktop",
       "tokenColor": "#6eca8f"
     },
@@ -70,7 +70,7 @@
       "role": "Receptionist",
       "avatar": "./assets/images/avatars/nora.svg",
       "naturalVoice": "en-US-EmmaMultilingualNeural",
-      "naturalRate": "-8%",
+      "naturalRate": "-18%",
       "voice": "Microsoft Zira Desktop",
       "tokenColor": "#a987ff"
     },
@@ -79,7 +79,7 @@
       "role": "Office guide",
       "avatar": "./assets/images/avatars/manager.svg",
       "naturalVoice": "en-US-JennyNeural",
-      "naturalRate": "-12%",
+      "naturalRate": "-22%",
       "voice": "Microsoft Zira Desktop",
       "tokenColor": "#f7c561"
     }
@@ -278,9 +278,99 @@
       ]
     },
     {
+      "id": "askNoraCup",
+      "title": "Ask Nora",
+      "instruction": "You have beans. Ask Nora for a cup.",
+      "targetIds": ["nora"],
+      "vocabulary": [
+        {
+          "term": "cup",
+          "definition": "a small thing for a drink",
+          "translation": "чашка"
+        },
+        {
+          "term": "clean",
+          "definition": "not dirty",
+          "translation": "чистый"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_cup_1",
+          "speaker": "narrator",
+          "text": "Nora is at the front desk."
+        },
+        {
+          "id": "hint_cup_2",
+          "speaker": "narrator",
+          "text": "Go left to reception."
+        }
+      ]
+    },
+    {
+      "id": "getCup",
+      "title": "Get the cup",
+      "instruction": "Nora says the clean cup is on the meeting table.",
+      "targetIds": ["meetingTable"],
+      "vocabulary": [
+        {
+          "term": "meeting table",
+          "definition": "the big table for meetings",
+          "translation": "стол для встречи"
+        },
+        {
+          "term": "mug",
+          "definition": "a cup for coffee",
+          "translation": "кружка"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_table_1",
+          "speaker": "narrator",
+          "text": "Go to the big table."
+        },
+        {
+          "id": "hint_table_2",
+          "speaker": "narrator",
+          "text": "The cup is in the meeting area."
+        }
+      ]
+    },
+    {
+      "id": "addWater",
+      "title": "Add water",
+      "instruction": "Take the cup to the water tap.",
+      "targetIds": ["waterCounter"],
+      "vocabulary": [
+        {
+          "term": "water",
+          "definition": "clear liquid for drinking",
+          "translation": "вода"
+        },
+        {
+          "term": "tap",
+          "definition": "water comes out of it",
+          "translation": "кран"
+        }
+      ],
+      "hints": [
+        {
+          "id": "hint_water_1",
+          "speaker": "narrator",
+          "text": "The tap is in the kitchen."
+        },
+        {
+          "id": "hint_water_2",
+          "speaker": "narrator",
+          "text": "Go back to the counter."
+        }
+      ]
+    },
+    {
       "id": "makeCoffee",
-      "title": "Use the beans",
-      "instruction": "Take the beans to the coffee machine.",
+      "title": "Make the coffee",
+      "instruction": "Go to the coffee machine with beans and water.",
       "targetIds": ["coffeeMachine"],
       "vocabulary": [
         {
@@ -289,9 +379,9 @@
           "translation": "положить внутрь"
         },
         {
-          "term": "at last",
-          "definition": "finally",
-          "translation": "наконец"
+          "term": "ready",
+          "definition": "finished and good now",
+          "translation": "готово"
         }
       ],
       "hints": [
@@ -529,7 +619,7 @@
             {
               "id": "coffee_finish_1",
               "speaker": "mia",
-              "text": "The beans are in."
+              "text": "Beans in. Water in."
             },
             {
               "id": "coffee_finish_2",
@@ -538,8 +628,13 @@
             },
             {
               "id": "coffee_finish_3",
+              "speaker": "mia",
+              "text": "Now I have my coffee."
+            },
+            {
+              "id": "coffee_finish_4",
               "speaker": "narrator",
-              "text": "You learned drawer, key, folder, printer, and beans."
+              "text": "You learned beans, cup, water, key, folder, and printer."
             }
           ],
           "effects": {
@@ -611,11 +706,11 @@
             }
           ],
           "effects": {
-            "step": "makeCoffee",
+            "step": "askNoraCup",
             "addInventory": ["beans"],
             "notes": [
               "You found the beans.",
-              "Go back to the machine."
+              "Now find a clean cup."
             ]
           }
         },
@@ -843,6 +938,32 @@
             ]
           ]
         },
+        "askNoraCup": {
+          "lines": [
+            {
+              "id": "nora_cup_1",
+              "speaker": "nora",
+              "text": "Hello, Mia. The clean cup is on the meeting table."
+            },
+            {
+              "id": "nora_cup_2",
+              "speaker": "nora",
+              "text": "Please take the blue cup."
+            },
+            {
+              "id": "nora_cup_3",
+              "speaker": "nora",
+              "text": "Then add water in the kitchen."
+            }
+          ],
+          "effects": {
+            "step": "getCup",
+            "notes": [
+              "Nora says the clean cup is on the meeting table.",
+              "Take the cup first."
+            ]
+          }
+        },
         "default": {
           "variants": [
             [
@@ -903,6 +1024,33 @@
             }
           ]
         },
+        "getCup": {
+          "lines": [
+            {
+              "id": "meeting_cup_1",
+              "speaker": "mia",
+              "text": "Here is the blue cup."
+            },
+            {
+              "id": "meeting_cup_2",
+              "speaker": "mia",
+              "text": "It is clean."
+            },
+            {
+              "id": "meeting_cup_3",
+              "speaker": "narrator",
+              "text": "Now add water in the kitchen."
+            }
+          ],
+          "effects": {
+            "step": "addWater",
+            "addInventory": ["cup"],
+            "notes": [
+              "You found the cup.",
+              "Take the cup to the water tap."
+            ]
+          }
+        },
         "default": {
           "lines": [
             {
@@ -953,6 +1101,57 @@
               "speaker": "narrator",
               "text": "Blue folder. Meeting notes."
             }
+          ]
+        }
+      }
+    },
+    {
+      "id": "waterCounter",
+      "label": "Water tap",
+      "kind": "object",
+      "asset": "counter",
+      "x": 1110,
+      "y": 168,
+      "scale": 1.15,
+      "radius": 98,
+      "responses": {
+        "addWater": {
+          "lines": [
+            {
+              "id": "water_fill_1",
+              "speaker": "mia",
+              "text": "The cup has water now."
+            },
+            {
+              "id": "water_fill_2",
+              "speaker": "narrator",
+              "text": "Take beans and water to the coffee machine."
+            }
+          ],
+          "effects": {
+            "step": "makeCoffee",
+            "notes": [
+              "The cup has water.",
+              "Go to the coffee machine."
+            ]
+          }
+        },
+        "default": {
+          "variants": [
+            [
+              {
+                "id": "water_default_1",
+                "speaker": "narrator",
+                "text": "Water is here."
+              }
+            ],
+            [
+              {
+                "id": "water_default_2",
+                "speaker": "narrator",
+                "text": "This tap is by the counter."
+              }
+            ]
           ]
         }
       }
@@ -1038,6 +1237,10 @@
     "beans": {
       "label": "Coffee beans",
       "icon": "./assets/images/ui/beans.svg"
+    },
+    "cup": {
+      "label": "Blue cup",
+      "icon": "./assets/images/ui/cup.svg"
     }
   }
 }

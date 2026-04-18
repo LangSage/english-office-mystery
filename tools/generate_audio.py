@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -20,10 +21,13 @@ except ImportError:  # pragma: no cover - optional dependency
 ROOT = Path(__file__).resolve().parents[1]
 STORY_PATH = ROOT / "assets" / "data" / "story.json"
 AUDIO_DIR = ROOT / "assets" / "audio" / "dialogue"
+FFMPEG_PATH = shutil.which("ffmpeg")
 DEFAULT_EDGE_VOICE = "en-US-EmmaMultilingualNeural"
-DEFAULT_EDGE_RATE = "-8%"
+DEFAULT_EDGE_RATE = "-18%"
 DEFAULT_EDGE_VOLUME = "+0%"
 DEFAULT_EDGE_PITCH = "+0Hz"
+DEFAULT_SYSTEM_RATE = -2
+LEADING_SILENCE_MS = 140
 
 
 def collect_lines(story: dict) -> list[dict]:
@@ -47,7 +51,7 @@ def collect_lines(story: dict) -> list[dict]:
     return list(seen.values())
 
 
-def build_powershell_script(text: str, voice_name: str, output_path: Path) -> str:
+def build_powershell_script(text: str, voice_name: str, output_path: Path, rate: int) -> str:
     escaped_text = text.replace("'", "''")
     escaped_voice = voice_name.replace("'", "''")
     escaped_output = str(output_path).replace("'", "''")
@@ -56,7 +60,7 @@ def build_powershell_script(text: str, voice_name: str, output_path: Path) -> st
 Add-Type -AssemblyName System.Speech
 $synth = New-Object System.Speech.Synthesis.SpeechSynthesizer
 $synth.SelectVoice('{escaped_voice}')
-$synth.Rate = 0
+$synth.Rate = {rate}
 $synth.SetOutputToWaveFile('{escaped_output}')
 $synth.Speak('{escaped_text}')
 $synth.Dispose()
@@ -102,6 +106,30 @@ def get_speaker_config(line: dict, speakers: dict) -> dict:
     return speakers[line["speaker"]]
 
 
+def pad_leading_silence(output_path: Path) -> None:
+    if FFMPEG_PATH is None or not output_path.exists():
+      return
+
+    padded_path = output_path.with_name(f"{output_path.stem}-padded{output_path.suffix}")
+    codec_args = ["-c:a", "pcm_s16le"] if output_path.suffix == ".wav" else ["-codec:a", "libmp3lame", "-q:a", "2"]
+    subprocess.run(
+        [
+            FFMPEG_PATH,
+            "-y",
+            "-i",
+            str(output_path),
+            "-af",
+            f"adelay={LEADING_SILENCE_MS}:all=true",
+            *codec_args,
+            str(padded_path),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    padded_path.replace(output_path)
+
+
 async def synthesize_with_edge(line: dict, speaker: dict) -> Path:
     if edge_tts is None:
         raise RuntimeError("edge-tts is not installed.")
@@ -115,6 +143,7 @@ async def synthesize_with_edge(line: dict, speaker: dict) -> Path:
         pitch=speaker.get("naturalPitch", DEFAULT_EDGE_PITCH),
     )
     await communicate.save(output_path)
+    pad_leading_silence(output_path)
     return output_path
 
 
@@ -127,21 +156,28 @@ def synthesize_with_gtts(line: dict, speaker: dict) -> Path:
         text=line["text"],
         lang=speaker.get("gttsLang", "en"),
         tld=speaker.get("gttsTld", "com"),
-        slow=False,
+        slow=speaker.get("gttsSlow", True),
     )
     tts.save(str(output_path))
+    pad_leading_silence(output_path)
     return output_path
 
 
 def synthesize_with_system(line: dict, speaker: dict) -> Path:
     output_path = AUDIO_DIR / f"{line['id']}.wav"
-    command = build_powershell_script(line["text"], speaker["voice"], output_path)
+    command = build_powershell_script(
+        line["text"],
+        speaker["voice"],
+        output_path,
+        speaker.get("systemRate", DEFAULT_SYSTEM_RATE),
+    )
     subprocess.run(
         ["powershell", "-NoProfile", "-Command", command],
         check=True,
         capture_output=True,
         text=True,
     )
+    pad_leading_silence(output_path)
     return output_path
 
 
