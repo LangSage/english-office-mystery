@@ -11,6 +11,9 @@ export class UIController {
       endTitle: document.getElementById("end-title"),
       endSummary: document.getElementById("end-summary"),
       starRow: document.getElementById("star-row"),
+      reviewStats: document.getElementById("review-stats"),
+      reviewWords: document.getElementById("review-words"),
+      reviewPhrases: document.getElementById("review-phrases"),
       startVocabList: document.getElementById("start-vocab-list"),
       subtitlePanel: document.getElementById("subtitle-panel"),
       subtitleSpeaker: document.getElementById("subtitle-speaker"),
@@ -20,6 +23,10 @@ export class UIController {
       messageTitle: document.getElementById("message-title"),
       messageText: document.getElementById("message-text"),
       messageClose: document.getElementById("message-close"),
+      questionPanel: document.getElementById("question-panel"),
+      questionText: document.getElementById("question-text"),
+      questionHelp: document.getElementById("question-help"),
+      questionOptions: document.getElementById("question-options"),
       infoButton: document.getElementById("info-button"),
       speakerAvatar: document.getElementById("speaker-avatar"),
       speakerName: document.getElementById("speaker-name"),
@@ -35,6 +42,10 @@ export class UIController {
       hintButton: document.getElementById("hint-button"),
       audioButton: document.getElementById("audio-button"),
       replayButton: document.getElementById("replay-button"),
+      difficultyOptions: document.getElementById("difficulty-options"),
+      audioEnabledInput: document.getElementById("audio-enabled-input"),
+      audioRateInput: document.getElementById("audio-rate-input"),
+      audioRateValue: document.getElementById("audio-rate-value"),
       drawerSheet: document.getElementById("drawer-sheet"),
       drawerTitle: document.getElementById("drawer-title"),
       drawerClose: document.getElementById("drawer-close")
@@ -54,6 +65,19 @@ export class UIController {
     this.elements.replayButton.addEventListener("click", handlers.onReplay);
     this.elements.drawerClose.addEventListener("click", () => this.closeDrawer());
     this.elements.messageClose.addEventListener("click", () => this.hideMessage());
+    this.elements.difficultyOptions.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-difficulty-id]");
+      if (!button) {
+        return;
+      }
+      handlers.onDifficultyChange(button.dataset.difficultyId);
+    });
+    this.elements.audioEnabledInput.addEventListener("change", (event) => {
+      handlers.onAudioEnabledChange(event.target.checked);
+    });
+    this.elements.audioRateInput.addEventListener("input", (event) => {
+      handlers.onAudioRateChange(Number(event.target.value));
+    });
 
     for (const button of this.drawerButtons) {
       button.addEventListener("click", () => {
@@ -73,15 +97,40 @@ export class UIController {
     return this.story.meta.preGameVocab ?? [];
   }
 
-  renderStartVocabulary() {
+  getDifficultyMode(settings) {
+    return this.story.meta.difficultyModes?.find((mode) => mode.id === settings.difficulty)
+      ?? this.story.meta.difficultyModes?.[0]
+      ?? { translationVisibility: "full" };
+  }
+
+  shouldShowTranslation(settings, context) {
+    const visibility = this.getDifficultyMode(settings).translationVisibility ?? "full";
+
+    if (visibility === "full") {
+      return true;
+    }
+
+    if (visibility === "lesson") {
+      return context !== "start";
+    }
+
+    if (visibility === "review") {
+      return context === "review";
+    }
+
+    return false;
+  }
+
+  renderStartVocabulary(settings) {
     this.elements.startVocabList.innerHTML = "";
+    const showTranslation = this.shouldShowTranslation(settings, "start");
 
     for (const item of this.getStartVocabulary()) {
       const entry = document.createElement("li");
       entry.innerHTML = `
         <span class="start-vocab-term">${item.term}</span>
         <span class="start-vocab-definition">${item.definition}</span>
-        ${item.translation ? `<span class="start-vocab-translation">${item.translation}</span>` : ""}
+        ${showTranslation && item.translation ? `<span class="start-vocab-translation">${item.translation}</span>` : ""}
       `;
       this.elements.startVocabList.appendChild(entry);
     }
@@ -129,6 +178,7 @@ export class UIController {
   }
 
   showMessage({ kicker = "Task", title = "", text = "" }) {
+    this.hideQuestion();
     this.closeDrawer();
     this.elements.messageKicker.textContent = kicker;
     this.elements.messageTitle.textContent = title;
@@ -150,12 +200,34 @@ export class UIController {
     this.elements.audioButton.setAttribute("title", enabled ? "Audio on" : "Audio off");
   }
 
-  render(state) {
-    this.renderStartVocabulary();
+  renderSettings(settings) {
+    this.elements.difficultyOptions.innerHTML = "";
+
+    for (const mode of this.story.meta.difficultyModes ?? []) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "settings-option";
+      button.dataset.difficultyId = mode.id;
+      button.classList.toggle("is-selected", mode.id === settings.difficulty);
+      button.innerHTML = `
+        <span class="settings-option-label">${mode.label}</span>
+        <span class="settings-option-help">${mode.description}</span>
+      `;
+      this.elements.difficultyOptions.appendChild(button);
+    }
+
+    this.elements.audioEnabledInput.checked = settings.audioEnabled;
+    this.elements.audioRateInput.value = String(settings.audioRate);
+    this.elements.audioRateValue.textContent = `${Math.round(settings.audioRate * 100)}%`;
+  }
+
+  render(state, settings) {
+    this.renderStartVocabulary(settings);
     this.renderWordsAttention(state.hasUnreadVocabulary());
+    this.renderSettings(settings);
 
     if (!state.started) {
-      this.renderVocabularyList(this.getStartVocabulary());
+      this.renderVocabularyList(this.getStartVocabulary(), settings, "start");
       this.renderInventory(state);
       this.renderList(this.elements.notesList, [
         "Read the 6 words first.",
@@ -166,7 +238,7 @@ export class UIController {
     }
 
     const step = state.getCurrentStep();
-    this.renderVocabularyList(step.vocabulary);
+    this.renderVocabularyList(step.vocabulary, settings, "lesson");
     this.renderInventory(state);
     this.renderList(
       this.elements.notesList,
@@ -175,7 +247,7 @@ export class UIController {
     this.renderProgress(state);
 
     if (state.completed) {
-      this.showEnd(state);
+      this.showEnd(state, settings);
     } else {
       this.hideEnd();
     }
@@ -189,15 +261,16 @@ export class UIController {
     wordsButton.classList.toggle("has-fresh-words", enabled);
   }
 
-  renderVocabularyList(items) {
+  renderVocabularyList(items, settings, context) {
     this.elements.vocabularyList.innerHTML = "";
+    const showTranslation = this.shouldShowTranslation(settings, context);
 
     for (const item of items) {
       const entry = document.createElement("li");
       entry.innerHTML = `
         <span class="word-term">${item.term}</span>
         <span class="word-definition">${item.definition}</span>
-        ${item.translation ? `<span class="word-translation">${item.translation}</span>` : ""}
+        ${showTranslation && item.translation ? `<span class="word-translation">${item.translation}</span>` : ""}
       `;
       this.elements.vocabularyList.appendChild(entry);
     }
@@ -253,6 +326,33 @@ export class UIController {
     }
   }
 
+  showQuestion(check) {
+    this.hideMessage();
+    this.closeDrawer();
+    this.elements.questionText.textContent = check.question;
+    this.elements.questionHelp.textContent = check.help ?? "Choose one answer.";
+    this.elements.questionOptions.innerHTML = "";
+
+    for (const option of check.options) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "question-option";
+      button.textContent = option.label;
+      button.addEventListener("click", () => {
+        this.handlers?.onComprehensionAnswer(check.id, option.id);
+      });
+      this.elements.questionOptions.appendChild(button);
+    }
+
+    this.elements.questionPanel.classList.remove("question-card-hidden");
+    this.updateCanvasState();
+  }
+
+  hideQuestion() {
+    this.elements.questionPanel.classList.add("question-card-hidden");
+    this.updateCanvasState();
+  }
+
   toggleDrawer(panelId) {
     if (this.activeDrawerId === panelId) {
       this.closeDrawer();
@@ -263,6 +363,9 @@ export class UIController {
   }
 
   openDrawer(panelId) {
+    if (!this.elements.questionPanel.classList.contains("question-card-hidden")) {
+      return;
+    }
     this.hideMessage();
     this.activeDrawerId = panelId;
     this.elements.drawerSheet.classList.remove("drawer-sheet-hidden");
@@ -308,21 +411,23 @@ export class UIController {
 
   showStart() {
     this.hideMessage();
+    this.hideQuestion();
     this.hideSubtitle();
     this.closeDrawer();
     this.elements.startScreen.classList.remove("overlay-card-hidden");
     this.updateCanvasState();
   }
 
-  showEnd(state) {
+  showEnd(state, settings) {
     this.hideMessage();
+    this.hideQuestion();
     this.hideSubtitle();
     this.closeDrawer();
     this.elements.endScreen.classList.remove("overlay-card-hidden");
     this.updateCanvasState();
     this.elements.endTitle.textContent = "The coffee is ready.";
     this.elements.endSummary.textContent =
-      `You used ${state.hintsUsed} hint${state.hintsUsed === 1 ? "" : "s"}. Nice work.`;
+      `You used ${state.hintsUsed} hint${state.hintsUsed === 1 ? "" : "s"} and got ${state.correctChecks}/${(state.story.comprehensionChecks ?? []).length} checks right.`;
     this.elements.starRow.innerHTML = "";
 
     for (let index = 0; index < 3; index += 1) {
@@ -331,6 +436,20 @@ export class UIController {
       star.textContent = index < state.getStars() ? "\u2605" : "\u2606";
       this.elements.starRow.appendChild(star);
     }
+
+    this.elements.reviewStats.innerHTML = "";
+    for (const stat of state.getReviewStats()) {
+      const card = document.createElement("div");
+      card.className = "review-stat";
+      card.innerHTML = `
+        <span class="review-stat-value">${stat.value}</span>
+        <span class="review-stat-label">${stat.label}</span>
+      `;
+      this.elements.reviewStats.appendChild(card);
+    }
+
+    this.renderReviewWords(state.getLearnedVocabulary(), settings);
+    this.renderReviewPhrases(state.getReviewPhrases(), settings);
   }
 
   hideEnd() {
@@ -338,10 +457,56 @@ export class UIController {
     this.updateCanvasState();
   }
 
+  renderReviewWords(items, settings) {
+    this.elements.reviewWords.innerHTML = "";
+    const showTranslation = this.shouldShowTranslation(settings, "review");
+
+    if (items.length === 0) {
+      const entry = document.createElement("li");
+      entry.textContent = "No new words were marked in this run.";
+      this.elements.reviewWords.appendChild(entry);
+      return;
+    }
+
+    for (const item of items) {
+      const entry = document.createElement("li");
+      entry.innerHTML = `
+        <span class="word-term">${item.term}</span>
+        <span class="word-definition">${item.definition}</span>
+        ${showTranslation && item.translation ? `<span class="word-translation">${item.translation}</span>` : ""}
+      `;
+      this.elements.reviewWords.appendChild(entry);
+    }
+  }
+
+  renderReviewPhrases(items, settings) {
+    this.elements.reviewPhrases.innerHTML = "";
+    const showTranslation = this.shouldShowTranslation(settings, "review");
+
+    if (items.length === 0) {
+      const entry = document.createElement("li");
+      entry.textContent = "Add review phrases in story.json.";
+      this.elements.reviewPhrases.appendChild(entry);
+      return;
+    }
+
+    for (const phrase of items) {
+      const speaker = this.story.speakers[phrase.speaker];
+      const entry = document.createElement("li");
+      entry.innerHTML = `
+        <span class="review-phrase-speaker">${speaker?.name ?? "Guide"}</span>
+        <span class="review-phrase-text">${phrase.text}</span>
+        ${showTranslation && phrase.translation ? `<span class="review-phrase-translation">${phrase.translation}</span>` : ""}
+      `;
+      this.elements.reviewPhrases.appendChild(entry);
+    }
+  }
+
   updateCanvasState() {
     const uiOpen =
       !this.elements.startScreen.classList.contains("overlay-card-hidden") ||
       !this.elements.endScreen.classList.contains("overlay-card-hidden") ||
+      !this.elements.questionPanel.classList.contains("question-card-hidden") ||
       !this.elements.messagePanel.classList.contains("message-card-hidden") ||
       !this.elements.drawerSheet.classList.contains("drawer-sheet-hidden");
     this.elements.canvasShell.classList.toggle("is-ui-open", uiOpen);

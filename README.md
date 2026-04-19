@@ -6,8 +6,12 @@
 
 - A playable browser game with arrow-key or `WASD` movement
 - Hint support for students who get stuck
+- Two built-in comprehension checks per case
+- Difficulty modes plus browser-side audio speed settings
+- End-of-case review with learned words and key phrases
 - Local pre-generated audio files for dialogue
 - A Python audio generator so you can regenerate voices after editing the story
+- A teacher build pipeline for creating a fresh game from a story template
 - A GitHub-friendly static site structure with no build step
 
 ## How To Run Locally
@@ -46,10 +50,27 @@ Speaker voice settings live in `assets/data/story.json` under each speaker:
 - `naturalRate` for a slower or faster reading speed
 - `voice` for the Windows fallback voice
 
+You can also point the generator at another story or output folder:
+
+```bash
+python tools/generate_audio.py --story-path teacher-kit/story-template.json --audio-dir builds/my-new-game/assets/audio/dialogue
+```
+
+## Teacher Builder
+
+- Start with `teacher-kit/story-template.json`
+- See `teacher-kit/asset-library.md` for reusable asset keys and avatar paths
+- Run `build_teacher_game.bat` for the default one-click build
+- Or run `python tools/build_game.py --story teacher-kit/story-template.json --output builds/my-new-game --force`
+
+The builder creates a fresh static game package with your edited story and regenerated audio.
+
 ## Classroom Notes
 
 - Students can move freely, but the objective card keeps the story focused.
 - The language is intentionally short, repetitive, and contextual.
+- Wrong interactions now coach students back toward the correct clue path.
+- Teachers can slow or speed the browser playback from the Settings panel.
 - Hints become stronger step by step, so weaker students can still finish the case.
 
 ## Credits

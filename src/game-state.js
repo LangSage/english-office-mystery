@@ -3,6 +3,23 @@ export class GameState {
     this.story = story;
     this.interactiveById = new Map(story.interactives.map((item) => [item.id, item]));
     this.stepIndexById = new Map(story.steps.map((step, index) => [step.id, index]));
+    this.checksById = new Map((story.comprehensionChecks ?? []).map((check) => [check.id, check]));
+    this.vocabularyByTerm = new Map();
+
+    for (const item of story.meta.preGameVocab ?? []) {
+      if (item?.term) {
+        this.vocabularyByTerm.set(item.term, item);
+      }
+    }
+
+    for (const step of story.steps) {
+      for (const item of step.vocabulary ?? []) {
+        if (item?.term) {
+          this.vocabularyByTerm.set(item.term, item);
+        }
+      }
+    }
+
     this.reset();
   }
 
@@ -19,6 +36,10 @@ export class GameState {
     this.responseTurns = {};
     this.knownVocabularyTerms = new Set();
     this.pendingVocabularyTerms = new Set();
+    this.shownCheckIds = new Set();
+    this.correctChecks = 0;
+    this.incorrectChecks = 0;
+    this.wrongInteractionCount = 0;
   }
 
   startCase() {
@@ -120,6 +141,21 @@ export class GameState {
     }
   }
 
+  buildWrongInteractionLines(interactive, baseLines, step) {
+    const lines = [];
+    const lastBaseLine = baseLines?.[baseLines.length - 1];
+
+    if (lastBaseLine) {
+      lines.push({ ...lastBaseLine });
+    }
+
+    for (const line of step.wrongInteraction?.lines ?? []) {
+      lines.push({ ...line });
+    }
+
+    return lines;
+  }
+
   getResponseLines(response, responseKey) {
     if (Array.isArray(response.variants) && response.variants.length > 0) {
       const turn = this.responseTurns[responseKey] ?? 0;
@@ -149,11 +185,13 @@ export class GameState {
       return null;
     }
 
+    const step = this.getCurrentStep();
+    const directResponse = interactive.responses?.[this.currentStepId];
     const responseKey = interactive.responses?.[this.currentStepId]
       ? `${interactiveId}:${this.currentStepId}`
       : `${interactiveId}:default`;
     const response =
-      interactive.responses?.[this.currentStepId] ??
+      directResponse ??
       interactive.responses?.default;
 
     if (!response) {
@@ -161,7 +199,17 @@ export class GameState {
     }
 
     const previousStepId = this.currentStepId;
-    const lines = this.getResponseLines(response, responseKey);
+    const targetIds = this.getTargetIds();
+    const usedWrongInteraction = !directResponse && !targetIds.includes(interactiveId) && Boolean(step.wrongInteraction);
+    let lines = this.getResponseLines(response, responseKey);
+
+    if (usedWrongInteraction) {
+      this.wrongInteractionCount += 1;
+      lines = this.buildWrongInteractionLines(interactive, lines, step);
+      if (step.wrongInteraction?.note) {
+        this.addNote(step.wrongInteraction.note);
+      }
+    }
 
     this.applyEffects(response.effects);
     this.setDialogue(lines);
@@ -170,7 +218,51 @@ export class GameState {
       lines,
       interactive,
       stepChanged: previousStepId !== this.currentStepId,
-      completed: this.completed
+      completed: this.completed,
+      usedWrongInteraction
+    };
+  }
+
+  getPendingComprehensionCheck() {
+    if (!this.started || this.completed) {
+      return null;
+    }
+
+    return (this.story.comprehensionChecks ?? []).find(
+      (check) => check.stepId === this.currentStepId && !this.shownCheckIds.has(check.id)
+    ) ?? null;
+  }
+
+  answerComprehension(checkId, optionId) {
+    const check = this.checksById.get(checkId);
+
+    if (!check || this.shownCheckIds.has(checkId)) {
+      return null;
+    }
+
+    const option = check.options.find((entry) => entry.id === optionId);
+    const correct = Boolean(option?.isCorrect);
+    const lines = correct ? (check.correctLines ?? []) : (check.wrongLines ?? []);
+
+    this.shownCheckIds.add(checkId);
+
+    if (correct) {
+      this.correctChecks += 1;
+    } else {
+      this.incorrectChecks += 1;
+    }
+
+    if (check.notes?.[correct ? "correct" : "wrong"]) {
+      this.addNote(check.notes[correct ? "correct" : "wrong"]);
+    }
+
+    this.setDialogue(lines);
+
+    return {
+      check,
+      option,
+      correct,
+      lines
     };
   }
 
@@ -249,5 +341,33 @@ export class GameState {
       return 2;
     }
     return 1;
+  }
+
+  getLearnedVocabulary() {
+    return Array.from(this.knownVocabularyTerms)
+      .map((term) => this.vocabularyByTerm.get(term))
+      .filter(Boolean)
+      .slice(0, 8);
+  }
+
+  getReviewPhrases() {
+    return this.story.meta.reviewPhrases ?? [];
+  }
+
+  getReviewStats() {
+    return [
+      {
+        label: "Hints",
+        value: String(this.hintsUsed)
+      },
+      {
+        label: "Checks",
+        value: `${this.correctChecks}/${(this.story.comprehensionChecks ?? []).length}`
+      },
+      {
+        label: "Wrong turns",
+        value: String(this.wrongInteractionCount)
+      }
+    ];
   }
 }

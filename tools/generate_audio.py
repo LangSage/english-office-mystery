@@ -19,8 +19,9 @@ except ImportError:  # pragma: no cover - optional dependency
 
 
 ROOT = Path(__file__).resolve().parents[1]
-STORY_PATH = ROOT / "assets" / "data" / "story.json"
-AUDIO_DIR = ROOT / "assets" / "audio" / "dialogue"
+DEFAULT_STORY_PATH = ROOT / "assets" / "data" / "story.json"
+DEFAULT_AUDIO_DIR = ROOT / "assets" / "audio" / "dialogue"
+AUDIO_DIR = DEFAULT_AUDIO_DIR
 FFMPEG_PATH = shutil.which("ffmpeg")
 DEFAULT_EDGE_VOICE = "en-US-EmmaMultilingualNeural"
 DEFAULT_EDGE_RATE = "-24%"
@@ -39,6 +40,13 @@ def collect_lines(story: dict) -> list[dict]:
     for step in story.get("steps", []):
         for hint in step.get("hints", []):
             seen[hint["id"]] = hint
+        for line in step.get("wrongInteraction", {}).get("lines", []):
+            seen[line["id"]] = line
+
+    for check in story.get("comprehensionChecks", []):
+        for group in ("correctLines", "wrongLines"):
+            for line in check.get(group, []):
+                seen[line["id"]] = line
 
     for interactive in story.get("interactives", []):
         for response in interactive.get("responses", {}).values():
@@ -82,6 +90,16 @@ def parse_args() -> argparse.Namespace:
         nargs="*",
         default=[],
         help="Optional list of line ids to regenerate.",
+    )
+    parser.add_argument(
+        "--story-path",
+        default=str(DEFAULT_STORY_PATH),
+        help="Path to the story JSON file.",
+    )
+    parser.add_argument(
+        "--audio-dir",
+        default=str(DEFAULT_AUDIO_DIR),
+        help="Directory where generated dialogue audio should be written.",
     )
     return parser.parse_args()
 
@@ -206,8 +224,10 @@ def synthesize_line(line: dict, speakers: dict, provider_order: list[str]) -> tu
 
 def main() -> None:
     args = parse_args()
-    AUDIO_DIR.mkdir(parents=True, exist_ok=True)
-    story = json.loads(STORY_PATH.read_text(encoding="utf-8"))
+    story_path = Path(args.story_path).resolve()
+    audio_dir = Path(args.audio_dir).resolve()
+    audio_dir.mkdir(parents=True, exist_ok=True)
+    story = json.loads(story_path.read_text(encoding="utf-8"))
     lines = collect_lines(story)
     provider_order = get_provider_order(args.provider)
 
@@ -216,9 +236,12 @@ def main() -> None:
         lines = [line for line in lines if line["id"] in only]
 
     print(
-        f"Generating {len(lines)} audio files into {AUDIO_DIR} "
+        f"Generating {len(lines)} audio files into {audio_dir} "
         f"with provider order: {', '.join(provider_order)}"
     )
+
+    global AUDIO_DIR
+    AUDIO_DIR = audio_dir
 
     for line in lines:
         provider, output_path = synthesize_line(line, story["speakers"], provider_order)

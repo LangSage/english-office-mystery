@@ -17,21 +17,69 @@ const ASSET_PATHS = {
   "woman-office": "./assets/images/environment/woman_office.png"
 };
 
+const SETTINGS_STORAGE_KEY = "english-office-mystery-settings";
+
+function getDefaultSettings(story) {
+  return {
+    difficulty: story.meta.defaultDifficulty ?? story.meta.difficultyModes?.[0]?.id ?? "easy",
+    audioRate: story.meta.defaultAudioRate ?? 1,
+    audioEnabled: true
+  };
+}
+
+function loadSettings(story) {
+  const defaults = getDefaultSettings(story);
+
+  try {
+    const raw = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!raw) {
+      return defaults;
+    }
+
+    return {
+      ...defaults,
+      ...JSON.parse(raw)
+    };
+  } catch {
+    return defaults;
+  }
+}
+
+function saveSettings(settings) {
+  try {
+    window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  } catch {
+    // Ignore storage failures in restrictive browsers.
+  }
+}
+
 class AudioController {
   constructor() {
     this.enabled = true;
+    this.playbackRate = 1;
     this.queueId = 0;
     this.lastLines = [];
     this.lastCallbacks = {};
     this.currentAudio = null;
   }
 
-  toggle() {
-    this.enabled = !this.enabled;
+  setEnabled(enabled) {
+    this.enabled = enabled;
     if (!this.enabled) {
       this.stop();
     }
     return this.enabled;
+  }
+
+  setPlaybackRate(rate) {
+    this.playbackRate = rate;
+    if (this.currentAudio) {
+      this.currentAudio.playbackRate = this.playbackRate;
+    }
+  }
+
+  toggle() {
+    return this.setEnabled(!this.enabled);
   }
 
   stop() {
@@ -76,6 +124,8 @@ class AudioController {
 
       callbacks.onLineEnd?.(line);
     }
+
+    callbacks.onQueueEnd?.();
   }
 
   playSingle(lineId) {
@@ -94,6 +144,7 @@ class AudioController {
 
         const audio = new Audio(candidates[index]);
         audio.preload = "auto";
+        audio.playbackRate = this.playbackRate;
         this.currentAudio = audio;
 
         const cleanup = () => {
@@ -244,6 +295,7 @@ async function bootstrap() {
   const state = new GameState(story);
   const ui = new UIController(story);
   const audio = new AudioController();
+  let settings = loadSettings(story);
   const touchState = {
     moveX: 0,
     moveY: 0,
@@ -261,8 +313,21 @@ async function bootstrap() {
 
   let sceneRef = null;
 
+  const applySettings = (nextSettings, { persist = true } = {}) => {
+    settings = {
+      ...settings,
+      ...nextSettings
+    };
+    audio.setEnabled(settings.audioEnabled);
+    audio.setPlaybackRate(settings.audioRate);
+    if (persist) {
+      saveSettings(settings);
+    }
+    render();
+  };
+
   const render = () => {
-    ui.render(state);
+    ui.render(state, settings);
     ui.renderAudioState(audio.enabled);
     if (sceneRef) {
       syncTargetMarkers(state, sceneRef.targetMarkers);
@@ -282,8 +347,19 @@ async function bootstrap() {
     });
   };
 
-  const runLines = (lines) => {
+  const maybeShowComprehension = () => {
+    const check = state.getPendingComprehensionCheck();
+    if (!check) {
+      return false;
+    }
+
+    ui.showQuestion(check);
+    return true;
+  };
+
+  const runLines = (lines, options = {}) => {
     if (!lines || lines.length === 0) {
+      options.afterQueue?.();
       return;
     }
 
@@ -294,6 +370,9 @@ async function bootstrap() {
         },
         onLineEnd: () => {
           ui.scheduleSubtitleHide(3000);
+        },
+        onQueueEnd: () => {
+          options.afterQueue?.();
         }
       });
       return;
@@ -301,6 +380,7 @@ async function bootstrap() {
 
     ui.setDialogue(lines, story.speakers);
     ui.scheduleSubtitleHide(3000);
+    options.afterQueue?.();
   };
 
   const startCase = () => {
@@ -312,8 +392,11 @@ async function bootstrap() {
       syncTargetMarkers(state, sceneRef.targetMarkers);
     }
     render();
-    runLines(lines);
-    showCurrentTask();
+    runLines(lines, {
+      afterQueue: () => {
+        showCurrentTask();
+      }
+    });
   };
 
   const resetCase = () => {
@@ -343,17 +426,65 @@ async function bootstrap() {
     }
   };
 
+  const answerComprehension = (checkId, optionId) => {
+    const result = state.answerComprehension(checkId, optionId);
+    if (!result) {
+      return;
+    }
+
+    ui.hideQuestion();
+    render();
+    runLines(result.lines, {
+      afterQueue: () => {
+        if (!state.completed) {
+          showCurrentTask();
+        }
+      }
+    });
+  };
+
   const handleInteraction = (interactiveId) => {
     const result = state.interact(interactiveId);
     if (!result) {
       return;
     }
-    render();
-    runLines(result.lines);
-    if (result.stepChanged && !result.completed) {
-      showCurrentTask();
+
+    if (result.completed) {
+      runLines(result.lines, {
+        afterQueue: () => {
+          render();
+        }
+      });
+      return;
     }
+
+    render();
+    runLines(result.lines, {
+      afterQueue: () => {
+        if (result.stepChanged && !maybeShowComprehension()) {
+          showCurrentTask();
+        }
+      }
+    });
   };
+
+  const updateAudioEnabled = (enabled) => {
+    applySettings({ audioEnabled: enabled });
+  };
+
+  const updateAudioRate = (rate) => {
+    applySettings({ audioRate: rate });
+  };
+
+  const updateDifficulty = (difficulty) => {
+    applySettings({ difficulty });
+  };
+
+  applySettings(settings, { persist: false });
+
+  if (query.get("mute") === "1") {
+    applySettings({ audioEnabled: false }, { persist: false });
+  }
 
   ui.bindHandlers({
     onStart: startCase,
@@ -361,14 +492,17 @@ async function bootstrap() {
     onInfo: showCurrentTask,
     onHint: requestHint,
     onAudioToggle: () => {
-      const enabled = audio.toggle();
-      ui.renderAudioState(enabled);
+      updateAudioEnabled(!audio.enabled);
     },
     onReplay: () => audio.replay(),
     onWordsViewed: () => {
       state.markCurrentVocabularySeen();
       render();
-    }
+    },
+    onComprehensionAnswer: answerComprehension,
+    onDifficultyChange: updateDifficulty,
+    onAudioEnabledChange: updateAudioEnabled,
+    onAudioRateChange: updateAudioRate
   });
 
   const resetJoystick = () => {
@@ -629,11 +763,6 @@ async function bootstrap() {
   });
 
   render();
-
-  if (query.get("mute") === "1") {
-    audio.enabled = false;
-    ui.renderAudioState(false);
-  }
 
   if (query.get("autostart") === "1") {
     window.setTimeout(() => {

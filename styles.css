@@ -205,6 +205,7 @@ p {
 }
 
 .subtitle-card,
+.question-card,
 .message-card,
 .drawer-sheet,
 .overlay-card {
@@ -277,6 +278,61 @@ p {
   display: none;
 }
 
+.question-card {
+  position: absolute;
+  top: 112px;
+  left: 16px;
+  right: 16px;
+  z-index: 7;
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 16px;
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(16px);
+}
+
+.question-card h3 {
+  font-size: 1.18rem;
+}
+
+.question-help {
+  color: var(--ink-soft);
+  line-height: 1.4;
+}
+
+.question-options {
+  display: grid;
+  gap: 10px;
+}
+
+.question-option {
+  appearance: none;
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(31, 36, 49, 0.12);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.question-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 143, 90, 0.42);
+  background: rgba(255, 244, 236, 0.96);
+}
+
+.question-card-hidden {
+  display: none;
+}
+
 .message-head,
 .drawer-head,
 .overlay-actions,
@@ -315,6 +371,13 @@ p {
 
 .overlay-card-hidden {
   display: none;
+}
+
+.review-screen {
+  place-content: start;
+  justify-items: stretch;
+  overflow: auto;
+  padding-bottom: 32px;
 }
 
 .start-text,
@@ -392,6 +455,83 @@ p {
 
 .drawer-panel.is-active {
   display: block;
+}
+
+.settings-block {
+  display: grid;
+  gap: 12px;
+}
+
+.settings-block + .settings-block {
+  margin-top: 10px;
+}
+
+.settings-options {
+  display: grid;
+  gap: 10px;
+}
+
+.settings-option {
+  appearance: none;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.settings-option:hover,
+.settings-option.is-selected {
+  transform: translateY(-1px);
+  border-color: rgba(255, 143, 90, 0.44);
+  background: rgba(255, 241, 232, 0.96);
+}
+
+.settings-option-label,
+.settings-option-help {
+  display: block;
+}
+
+.settings-option-label {
+  font-weight: 800;
+}
+
+.settings-option-help {
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.settings-row-stack {
+  align-items: baseline;
+}
+
+.settings-label,
+.settings-value {
+  font-weight: 700;
+}
+
+.settings-check {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent-strong);
+}
+
+.settings-range {
+  width: 100%;
+  accent-color: var(--accent-strong);
 }
 
 .speaker-card {
@@ -511,6 +651,69 @@ p {
 
 .star {
   font-size: 2rem;
+}
+
+.review-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.review-stat,
+.review-block {
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.review-stat {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.review-stat-value {
+  font-size: 1.3rem;
+  font-weight: 800;
+}
+
+.review-stat-label {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.84rem;
+}
+
+.review-block {
+  padding: 14px;
+}
+
+.review-list li {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+}
+
+.review-phrase-speaker,
+.review-phrase-text,
+.review-phrase-translation {
+  display: block;
+}
+
+.review-phrase-speaker {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.review-phrase-text {
+  margin-top: 6px;
+  font-weight: 700;
+}
+
+.review-phrase-translation {
+  margin-top: 6px;
+  color: var(--accent-strong);
 }
 
 .touch-controls {
@@ -642,6 +845,12 @@ p {
     left: 84px;
     right: 84px;
     padding: 16px 18px;
+  }
+
+  .question-card {
+    left: 84px;
+    right: 84px;
+    padding: 18px;
   }
 
   .subtitle-card {
